@@ -133,9 +133,9 @@ s7 = time.time()
 print(f'matrix multiplication done in {s7-s6} secs')
 
 #### Save only the necessary values
-# ret_df = df[['r', 'theta', 'phi', 'alpha', 'psi', 'gtx', 'gty', 'gtz', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z', 'B__x', 'B__y', 'B__z']]
-# ret_df.to_hdf('3D_data/all_data.h5', key='df', mode='w')
+ret_df = df[['r', 'theta', 'phi', 'alpha', 'psi', 'gtx', 'gty', 'gtz', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z', 'B__x', 'B__y', 'B__z']]
+ret_df.to_hdf('3D_data/not_horizon_data.h5', key='df', mode='w')
 
-rho_df = df[['x', 'y', 'z','rho']]
-rho_df.to_hdf('3D_data/rho_data.h5', key='df', mode='w')
-print(f"Run took: {time.time() - start_time} seconds 3D_data/all_data.h5")
+# rho_df = df[['x', 'y', 'z','rho']]
+# rho_df.to_hdf('3D_data/rho_data.h5', key='df', mode='w')
+print(f"Run took: {time.time() - start_time} seconds 3D_data/not_horizon_data.h5")
