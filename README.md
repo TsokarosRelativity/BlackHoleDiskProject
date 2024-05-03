@@ -41,21 +41,21 @@ It is important to first generate the new $\varphi$ grid points and populate wit
 
 ##### Define extrinsic curvature and then reflect to -z coordinates
 We would also like to populate the lower hemisphere with data, however there is a certain tensorial quantity which will indeed change after reflection. The non-zero component of the extrinsic curvature which has $\theta$ dependence will (of course) be impacted when we reflect about the x-y plane. It takes the following form:
-$$
-K_{\theta \varphi} = K_{\varphi \theta} = \frac{H_F \sin{\theta}}{\psi^2r} + \frac{1}{2\alpha} \psi^4 r^2 \sin^2{\theta} \partial_{\theta} \beta_T 
-$$
+
+$$K_{\theta \varphi} = K_{\varphi \theta} = \frac{H_F \sin{\theta}}{\psi^2r} + \frac{1}{2\alpha} \psi^4 r^2 \sin^2{\theta} \partial_{\theta} \beta_T $$
+
 When we apply our reflection, we are simply duplicating each grid point (along with its data) and making a new point such that $\theta \rightarrow \pi - \theta$. This will make $K_{\theta \varphi} \rightarrow -K_{\theta \varphi}$ (the sine function and partial derivate will aquire a negative sign). Therefore when we populate our negative hemisphere we must be careful to include this change. 
 
 In this step we also calculated the fluid pressure $P = K \rho^\Gamma$ using the values of K and $\gamma$ as output form the sho100 x.dat file. 
 
 ##### Assemble the Jacobian and Metric
-Next we assemble the 4x4 jacobian as well as the 4x4 metric (in its covariant and contravariant forms). The jacobian will be used to transform our tensors from spherical to cartesian coordinates. The metric will be used to raise and lower indices on other tensors. Notes on the exact mathematics (including formulas) of both are in the [mathematical review](#Mathematical-Review) section. 
+Next we assemble the 4x4 jacobian as well as the 4x4 metric (in its covariant and contravariant forms). The jacobian will be used to transform our tensors from spherical to cartesian coordinates. The metric will be used to raise and lower indices on other tensors. Notes on the exact mathematics (including formulas) of both are in the mathematical review section. 
 
 ##### Calculate Fluid Velocity and Magnetic Field components
 Fluid velocity only has $u^\varphi$ component:
-$$
-u^\varphi = \Omega*(\alpha^2 - \psi^4r^2\sin^2\theta ( \Omega + \beta)^2)^{-1/2}
-$$
+
+$$u^\varphi = \Omega*(\alpha^2 - \psi^4r^2\sin^2\theta ( \Omega + \beta)^2)^{-1/2}$$
+
 We can use the Jacobian to convert from spherical to cartesian. A simple conversion 
 
 
@@ -130,9 +130,9 @@ end do
 
 ##### Radial Grid:
 The radial grid is defined by having the inner most radius be equal to the BH radius $r_s = \frac{1}{2}\sqrt{m-a^2}$ where $m,a$ are the BH mass and angular momentum respectively. Then we define $dr = r_s/50$ and $fac = 1.01$. Then the radial array is generated using the formula:
-$$
-r(i) = r_s + \frac{fac^{i-1}-1}{fac -1}*dr
-$$
+
+$$r(i) = r_s + \frac{fac^{i-1}-1}{fac -1}*dr$$
+
 for $i \in (2,n_r+2)$
 
 This will generate a very fine grid near the BH but will become exponentially more spaced
@@ -145,12 +145,8 @@ The angular grid has two options:
 
 Option 1 is self explanatory and by default not used. 
 Option 2 first defines the value $d \mu = \frac{1}{n_t}$ and then generates a grid of $\mu$ and $\theta$ values using the formula:
-$$
-\mu(j) = 1 + 0.5d\mu - (j-1)d\mu
-$$
-$$
-\theta(j) = \arccos{\mu(j)}
-$$
+$$\mu(j) = 1 + 0.5d\mu - (j-1)d\mu$$
+$$\theta(j) = \arccos{\mu(j)}$$
 
 for $i \in (2,n_t+2)$
 
