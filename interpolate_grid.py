@@ -29,20 +29,20 @@ def interpolate_grid(new_grid, df):
     y_arr = np.arange(y_min, y_min + dy*Ny, dy)
     z_arr = np.arange(z_min, z_min + dz*Nz, dz)
     s2 = time.time()
-    new_lines = []
+    data = []
     total_points = Nx*Ny*Nz
     processed_points = 0
-    for x in x_arr:
+    for z in z_arr:
         for y in y_arr:
-            for z in z_arr:
+            for x in x_arr:
                 processed_points += 1
                 # progress = processed_points / total_points * 100
                 # print(f'Progress: {progress:.2f}%', end='\r')
                 p = np.array([x,y,z])
-                new_line = [x, y, z]
-                new_line += interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map)
-                new_lines.append(new_line)
-    return new_lines
+                # new_line = [x, y, z]
+                new_line = interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map)
+                data.append(new_line)
+    return np.concatenate(data)
 
 def process_line(line):
     parts = line.split()[1:]  # Ignore the first column
@@ -57,9 +57,15 @@ def interpolate_grids(input_file, df):
             start = time.time()
             new_grid, output_file = process_line(line)
             interpolated_grid = interpolate_grid(new_grid, df)
-            np.savetxt(output_dir + output_file, interpolated_grid)
+            # np.savetxt(output_dir + output_file, interpolated_grid)
+            nx, ny, nz = new_grid[6:9]
+            ntot = nx*ny*nz
+            with open(output_dir + output_file, 'wb') as f:
+                f.write(np.array([nx, ny, nz, ntot], dtype=np.int32).tobytes())
+                f.write(interpolated_grid.astype(np.float64).tobytes())
             print(f"File '{output_file}' created in {time.time() - start} seconds")
 
 
-# input_file = 'patryk_grids/output_3.txt'
+### For test purposes
+# input_file = 'patryk_grids/test.txt'
 # interpolate_grids(input_file, df)
