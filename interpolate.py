@@ -217,7 +217,7 @@ def interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map):
     s8 = time.time()
     # print(f'interpolated all data in {s8-s7} sec')
     # print(f'interpolation runtime: {s8-s2}')
-    return interpolated_vals
+    return np.array(interpolated_vals)
 
 #### For testing purposes
 # s1 = time.time()
