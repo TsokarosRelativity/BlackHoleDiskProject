@@ -3,6 +3,8 @@ import pandas as pd
 from interpolate import *
 import time
 import argparse
+from joblib import Parallel, delayed
+
 parser = argparse.ArgumentParser(
         prog="Interpolation Routine",
         description="Interpolating the 3D data",
@@ -71,11 +73,29 @@ def interpolate_grids(input_file, df):
                 f.write(interpolated_grid.astype(np.float64).tobytes())
             print(f"File '{output_file}' created in {time.time() - start} seconds")
 
+def grid_writer(line, df):
+    start = time.time()
+    new_grid, outputf = process_line(line)
+    ig = interpolate_grid(new_grid, df)
+    nx, ny, nz = new_grid[6:9]
+    ntot = nx*ny*nz
+    with open(args.data_folder + output_dir + output_file, 'wb') as f:
+        f.write(np.array([nx, ny, nz, ntot], dtype=np.int32).tobytes())
+        f.write(interpolated_grid.astype(np.float64).tobytes())
+    print(f"File '{output_file}' created in {time.time() - start} seconds")
+
+
+
 
 s3 = time.time()
 
 gridfile = "grids_bh_disk_patrik"
-interpolate_grids(gridfile, df)
+#interpolate_grids(gridfile, df)
+
+with open(gridfile, 'r') as f:
+    lines = f.readlines()
+    r = Parallel(n_jobs=-1)(delayed(grid_writer)(l, df) for l in lines)
+
 print("interpolation finished")
 ### For test purposes
 # input_file = 'patryk_grids/test.txt'
