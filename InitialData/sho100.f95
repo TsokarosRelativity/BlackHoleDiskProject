@@ -368,6 +368,18 @@ do i = 1, nrr
 write(*,*) i, r(i)
 end do
 
+! formatted means the file is human readable
+open(69, file="all_rvalues.dat", form="formatted")
+
+write(69, *) 'i, r(i), dr(i)'
+write(69, *)
+write(69, *) 1, rin, 0.0d0
+do i = 2, nrr
+    write(69,*) i, r(i),  (fac**(i-1) - 1.0d0)*dr/(fac - 1.0d0)
+    write(69,*)
+end do
+close(69)
+
 write(*,*) 'inner boundary:        ', rs
 write(*,*) 'outer boundary:        ', r(nrr)
 write(*,*) 'outer boundary:        ', r(nrr)/rs, ' rs.'
