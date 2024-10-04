@@ -292,9 +292,13 @@ horizondf = df.copy()
 
 horizondf = horizondf[~(np.abs(horizondf.r - rs) < tolerance)]
 horizondf['r'] = horizondf['r'].apply(lambda x: (rs**2)/x)
-horizondf['x'] = horizondf.r * np.sin(horizondf.theta) * np.cos(horizondf.phi)
-horizondf['y'] = horizondf.r * np.sin(horizondf.theta) * np.sin(horizondf.phi)
-horizondf['z'] = horizondf.r * np.cos(horizondf.theta)
+horizondf['alpha'] = -horizondf['alpha']
+horizondf['u__z'] = -horizondf['u__z']
+horizondf['u__x'] = -horizondf['u__x']
+horizondf['u__y'] = -horizondf['u__y']
+#horizondf['x'] = horizondf.r * np.sin(horizondf.theta) * np.cos(horizondf.phi)
+#horizondf['y'] = horizondf.r * np.sin(horizondf.theta) * np.sin(horizondf.phi)
+#horizondf['z'] = horizondf.r * np.cos(horizondf.theta)
 
 dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
 s10 = time.time()
