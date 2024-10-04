@@ -40,19 +40,18 @@ def locate_point(r_arr,theta_arr,phi_arr, p): #r_arr, theta_arr, phi_arr define 
     
     else:
         combinations = []
-
-        for r in rs:
+        
+        if rs[0] == 0:
             for t in ts:
                 for p in ps:
-                    ### save points in cartesian
-                    # x_0 = r*np.sin(t)*np.cos(p)
-                    # y_0 = r*np.sin(t)*np.sin(p)
-                    # z_0 = r*np.cos(t)
-                    # combination = (x_0,y_0,z_0)
-                    # combinations.append(combination)
-
-                    ### save points in spherical
-                    combinations.append([r,t,p])
+                    combinations.append([rs[1],t,p])
+            combinations.append([0,0,0])
+        else:
+            for r in rs:
+                for t in ts:
+                    for p in ps:
+                        ### save points in spherical
+                        combinations.append([r,t,p])
 
         return combinations
     
@@ -151,75 +150,37 @@ def spherical2cart(r,t,p):
 
 # data = load_3d_data('3D_data/ext_cur.3d')
 def interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map):
-    # data = np.loadtxt(data)
-    x0,y0,z0 = p
-    rad = np.sqrt(x0**2 + y0**2 + z0**2)
     num_scalars = len(df.columns) - 3
-    s2 = time.time()
-
-    if rad <= r_s: #if the point is in the BH we reflect out using r_new = (r_s**2)/rad
-        if (r_s**2) > rad*np.max(rad_arr): # if the new radius is outside of our grid populate variables with nan
-            scalars = np.full(num_scalars, np.nan)
-            return scalars
-        sf = (r_s/rad)**2 #sf = scale factor between r_new/rad
-        x1 = x0*sf
-        y1 = y0*sf
-        z1 = z0*sf
-        p = (x1,y1,z1)
-        # return np.concatenate((np.array([x0,y0,z0]),scalars))
-    s4 = time.time()
     surrounding_pts = locate_point(rad_arr,theta_arr,phi_arr, p)
-    s5 = time.time()
-    # print(f'surrounding points located in {s5-s4} sec')
 
     if not surrounding_pts:
         print(f'could not find point in grid, grid has these properties:')
         print(f'r_min, r_max, num_r = {rad_arr[0], rad_arr[-1], len(rad_arr)}, t_min, t_max, num_t = {theta_arr[0], theta_arr[-1], len(theta_arr)}, p_min, p_max, num_p = {phi_arr[0], phi_arr[-1], len(phi_arr)}')
+        return ValueError
     surrounding_pts = np.array(surrounding_pts)
 
     points = []
     scalars = []
-    s6 = time.time()
+
     for point in surrounding_pts:
         r, theta, phi = point
-        # tolerance = 0.0001
         # Find the closest matching row in df based on spherical coordinates
-        a = time.time()
-        # closest_row = df[
-        #     ((df['r'] - r).abs() < tolerance) &
-        #     ((df['theta'] - theta).abs() < tolerance) &
-        #     ((df['phi'] - phi).abs() < tolerance)
-        # ]
         row_idx = idx_point_map[(r, theta, phi)]
         closest_row = df.iloc[row_idx]
-        # print(f'closest_row: {closest_row}')
-        b = time.time()
-        # print(f'sliced df in {b-a}secs')
         # Check if any rows are found
         if not closest_row.empty:
-            # Store the other columns in that row to an array
-            c = time.time()
-            # point_array = closest_row.iloc[0].values
             point_array = closest_row
             x,y,z = spherical2cart(point_array.iloc[0], point_array.iloc[1], point_array.iloc[2])
             points.append([x,y,z])
             scalars.append(point_array[3:])
-            d = time.time()
-            # print(f'appended data in {d-c}secs')
-    s7 = time.time()
-    # print(f'found data for surrounding points in {s7-s6} sec')
     points = np.array(points)
     scalars = np.array(scalars)
     interpolated_vals = []
     for i in range(num_scalars):
-        # print(f'scalar_vals[{i}] = {scalar_vals[:,i]}')
         interpolated_vals.append(calc_weighted_average(points, scalars[:,i], p))
-    s8 = time.time()
-    # print(f'interpolated all data in {s8-s7} sec')
-    # print(f'interpolation runtime: {s8-s2}')
     return np.array(interpolated_vals)
 
-#### For testing purposes
+### For testing purposes
 # s1 = time.time()
 # print('starting preprocessing')
 # df = pd.read_hdf('3D_data/all_data.h5', key='df')

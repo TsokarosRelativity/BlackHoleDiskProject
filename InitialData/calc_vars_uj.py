@@ -173,7 +173,7 @@ if args.v:
     print("-----------------------------------------------")
 s7 = time.time()
 # Explicitly calculating gamma_ab in Cartesian coordinates
-df['gxx'] = df.psi**4 * np.exp(2*df.q) * (df.x**2 / df.r**2 + df.z**2 * np.cos(df.phi)**2 / df.r**2) + np.sin(df.phi)**2*df.psi**4
+df['gxx'] = (df.psi**4 * np.exp(2*df.q)) * (((df.x / df.r)**2) + ((df.z * np.cos(df.phi) / df.r)**2)) + np.sin(df.phi)**2*df.psi**4
 df['gxy'] = df.psi**4 * np.exp(2*df.q) * (df.x * df.y / df.r**2 + df.z**2 * np.cos(df.phi) * np.sin(df.phi) / df.r**2 )- np.sin(df.phi) * np.cos(df.phi)*df.psi**4
 df['gxz'] = df.psi**4 * np.exp(2*df.q) * (df.x * df.z / df.r**2 - df.z * np.cos(df.phi) * np.sqrt(df.x**2 + df.y**2) / df.r**2)
 df['gyy'] = df.psi**4 * np.exp(2*df.q) * (df.y**2 / df.r**2 + df.z**2 * np.sin(df.phi)**2 / df.r**2 )+ np.cos(df.phi)**2*df.psi**4
@@ -256,32 +256,6 @@ if args.v:
     print("calculations completed in {} seconds".format(time.time() - s12))
 
     print("-----------------------------------------------")
-#print(dict(df.dtypes))
-# Explicitly calculating K_ab in Cartesian coordinates
-# For the horizon region (cond1)
-#print("phi")
-#print((foo.phi == df.phi).describe())
-#print("Hf")
-#print((foo.Hf == df.Hf).describe())
-#print("z")
-#print((foo.z == df.z).describe())
-#print("He")
-#print((foo.He == df.He).describe())
-#print("x")
-#print((foo.x == df.x).describe())
-#print("theta")
-#print((foo.theta == df.theta).describe())
-#print("psi")
-#print((foo.psi == df.psi).describe())
-#print("r")
-#print((foo.r == df.r).describe())
-#print("alpha")
-#print((foo.alpha == df.alpha).describe())
-#print("dbetatdr")
-#print((foo.dbetatdr == df.dbetatdr).describe())
-#print("y")
-#print((foo.y == df.y).describe())
-
 
 
 
@@ -290,15 +264,12 @@ if args.v:
 s9 = time.time()
 horizondf = df.copy()
 
-horizondf = horizondf[~(np.abs(horizondf.r - rs) < tolerance)]
+horizondf = horizondf[~(np.abs(horizondf.r - rs) < 0.00001)]
 horizondf['r'] = horizondf['r'].apply(lambda x: (rs**2)/x)
 horizondf['alpha'] = -horizondf['alpha']
 horizondf['u__z'] = -horizondf['u__z']
 horizondf['u__x'] = -horizondf['u__x']
 horizondf['u__y'] = -horizondf['u__y']
-#horizondf['x'] = horizondf.r * np.sin(horizondf.theta) * np.cos(horizondf.phi)
-#horizondf['y'] = horizondf.r * np.sin(horizondf.theta) * np.sin(horizondf.phi)
-#horizondf['z'] = horizondf.r * np.cos(horizondf.theta)
 
 dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
 s10 = time.time()
@@ -307,11 +278,44 @@ if args.v:
 # Save the necessary values
 #ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
 ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z', 'A_x', 'A_y', 'A_z']]
+
+origin = {
+        'r': [np.float64(0)],
+        'theta': [np.float64(0)],
+        'phi': [np.float64(0)],
+        'alpha': [np.float64(1)],
+        'beta__x': [np.float64(0)],
+        'beta__y': [np.float64(0)],
+        'beta__z': [np.float64(0)],
+        'psi': [np.float64(1)],
+        'gxx': [np.float64(0)],
+        'gxy': [np.float64(0)],
+        'gxz': [np.float64(0)],
+        'gyy': [np.float64(1)],
+        'gyz': [np.float64(0)],
+        'gzz': [np.float64(0)],
+        'Kxx': [np.float64(0)],
+        'Kxy': [np.float64(0)],
+        'Kxz': [np.float64(0)],
+        'Kyy': [np.float64(0)],
+        'Kyz': [np.float64(0)],
+        'Kzz': [np.float64(0)],
+        'rho': [np.float64(0)],
+        'u__x': [np.float64(0)],
+        'u__y': [np.float64(0)],
+        'u__z': [np.float64(0)],
+        'A_x': [np.float64(0)],
+        'A_y': [np.float64(0)],
+        'A_z': [np.float64(0)]
+        }
+
+origin_df = pd.DataFrame(origin)
+
+ret_df = pd.concat([ret_df, origin_df], axis=0, ignore_index=True)
+
 ret_df.to_hdf(args.folder + '3D_data/all_data_updated_jacobian.h5', key='df', mode='w')
 
-comparedf = dfall[['x', 'z', 'r', 'theta', 'phi', 'alpha', 'psi', 'q', 'betak', 'betat', 'dbetatdr', 'dbetatdt', 'He', 'Hf', 'Omega', 'b2', 'rho']]
 
-comparedf.to_hdf(args.folder + '3D_data/compared_data.h5', key='df', mode='w')
 if args.v:
     print(f'saving done in {time.time() - s8} secs ')
 
