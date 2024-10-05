@@ -71,14 +71,17 @@ def interpolate_grids(input_file, df):
             new_grid, output_file = process_line(line)
             interpolated_grid = interpolate_grid(new_grid, df)
             IGDF = pd.DataFrame(interpolated_grid, columns=df.columns)
-            IGDF.to_hdf( args.data_folder + output_dir + "dataframe_" + output_file + ".h5", key="df", mode="w")
+            IGDF.to_hdf(
+                args.data_folder + output_dir + "dataframe_" + output_file + ".h5",
+                key="df",
+                mode="w",
+            )
             nx, ny, nz = new_grid[6:9]
             ntot = nx * ny * nz
             with open(args.data_folder + output_dir + output_file, "wb") as f:
                 f.write(np.array([nx, ny, nz, ntot], dtype=np.int32).tobytes())
                 f.write(interpolated_grid.astype(np.float64).tobytes())
             print(f"File '{output_file}' created in {time.time() - start} seconds")
-
 
 
 gridfile = "grids_bh_disk_patrik"
