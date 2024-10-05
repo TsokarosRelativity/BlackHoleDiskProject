@@ -36,7 +36,7 @@ gfortran -fopenmp -O2 "$file_name" -o sho100 -L/usr/lib/x86_64-linux-gnu/lapack 
 mv sho100 2D_data/
 cd 2D_data/
 ./sho100
-cd ..
+cd ../../
  
 
 # Generate 3D data and perform necessary variable calculations

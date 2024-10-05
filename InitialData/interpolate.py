@@ -52,8 +52,6 @@ def locate_point(
     return np.array(combinations)
 
 
-
-
 # https://en.wikipedia.org/wiki/Inverse_distance_weighting
 def calc_weighted_average(points, scalar_values, p):
     # points should be a numpy array
@@ -68,6 +66,8 @@ def calc_weighted_average(points, scalar_values, p):
         return scalar_values[np.argmin(d)]
 
     return np.sum(weights * scalar_values) / np.sum(weights)
+
+
 def spherical2cart(r, t, p):
     x = r * np.sin(t) * np.cos(p)
     y = r * np.sin(t) * np.sin(p)
@@ -128,8 +128,6 @@ def load_3d_data(data_3d_path):
     return data
 
 
-
-
 #    for point in surrounding_pts:
 #        r, theta, phi = point
 #        # Find the closest matching row in df based on spherical coordinates
@@ -149,48 +147,47 @@ def load_3d_data(data_3d_path):
 #    for i in range(num_scalars):
 #        interpolated_vals.append(calc_weighted_average(points, scalars[:, i], p))
 #    return np.array(interpolated_vals)
-#def plot_points(r_arr, theta_arr, phi_arr, p):
+# def plot_points(r_arr, theta_arr, phi_arr, p):
 
-    # p = (5,3,10)
-    # Define the list of 8 points
+# p = (5,3,10)
+# Define the list of 8 points
 
 #    points = locate_point(r_arr, theta_arr, phi_arr, p)
 
 #    print(points)
-    # Extract x, y, z coordinates for both points and p
+# Extract x, y, z coordinates for both points and p
 #    x_points, y_points, z_points = zip(*points)
 #    x_p, y_p, z_p = p
 
-    # Create a 3D plot
+# Create a 3D plot
 #    fig = plt.figure()
 #    ax = fig.add_subplot(111, projection="3d")
 
-    # Plot the 8 points in blue
+# Plot the 8 points in blue
 #    ax.scatter(x_points, y_points, z_points, c="blue", label="Points")
 
-    # Plot the single point p in red
+# Plot the single point p in red
 #    ax.scatter(x_p, y_p, z_p, c="red", label="Point p")
 
-    # Change view and limits of plot
+# Change view and limits of plot
 #    ax.view_init(elev=80, azim=0)
 
-    # ax.set_xlim(0, 5)  # Set limits for the X-axis
-    # ax.set_ylim(-5, 5)  # Set limits for the Y-axis
-    # ax.set_zlim(-5, 5)  # Set limits for the Z-axis
+# ax.set_xlim(0, 5)  # Set limits for the X-axis
+# ax.set_ylim(-5, 5)  # Set limits for the Y-axis
+# ax.set_zlim(-5, 5)  # Set limits for the Z-axis
 
-    # Add labels
-    #ax.set_xlabel("X")
-    #ax.set_ylabel("Y")
-   # ax.set_zlabel("Z")
+# Add labels
+# ax.set_xlabel("X")
+# ax.set_ylabel("Y")
+# ax.set_zlabel("Z")
 
-    # Add a legend
-  #  ax.legend()
+# Add a legend
+#  ax.legend()
 
- #   plt.savefig("points_plot.png")
+#   plt.savefig("points_plot.png")
 
-    # Show the plot
-    # plt.show()
-
+# Show the plot
+# plt.show()
 
 
 ### For testing purposes
