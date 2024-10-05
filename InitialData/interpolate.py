@@ -27,7 +27,7 @@ def locate_point(
             break
     for i in range(len(theta_arr) - 1):
         if theta_arr[i] <= theta_0 <= theta_arr[i + 1]:
-            ts = (theta_0[i], theta_0[i + 1])
+            ts = (theta_arr[i], theta_arr[i + 1])
             break
     for i in range(len(phi_arr) - 1):
         if phi_arr[i] <= phi_0 <= phi_arr[i + 1]:
@@ -62,19 +62,12 @@ def calc_weighted_average(points, scalar_values, p):
     #    weights = 1.0 / distances
     p = np.array(p)
     d = np.sum((points - p) ** 2, axis=1)
-    weights = 1.0 / (d + 1e-6) ** 2
+    weights = 1.0 / ((d + 1e-6) ** 2)
 
-    if np.any(d < 1e-6):
+    if np.any(d <= 1e-6):
         return scalar_values[np.argmin(d)]
 
     return np.sum(weights * scalar_values) / np.sum(weights)
-
-
-def load_3d_data(data_3d_path):
-    data = np.loadtxt(data_3d_path)
-    return data
-
-
 def spherical2cart(r, t, p):
     x = r * np.sin(t) * np.cos(p)
     y = r * np.sin(t) * np.sin(p)
@@ -128,6 +121,13 @@ def interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map):
 # num_phi = 500
 # phi_arr = np.linspace(0, 2*np.pi, num_phi+1)
 ##########
+
+
+def load_3d_data(data_3d_path):
+    data = np.loadtxt(data_3d_path)
+    return data
+
+
 
 
 #    for point in surrounding_pts:

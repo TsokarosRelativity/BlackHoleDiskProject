@@ -44,23 +44,16 @@ def interpolate_grid(new_grid, df):
     x_arr = np.arange(x_min, x_min + dx * Nx, dx)
     y_arr = np.arange(y_min, y_min + dy * Ny, dy)
     z_arr = np.arange(z_min, z_min + dz * Nz, dz)
-    s2 = time.time()
     data = []
-    total_points = Nx * Ny * Nz
-    processed_points = 0
     for z in z_arr:
         for y in y_arr:
             for x in x_arr:
-                processed_points += 1
-                # progress = processed_points / total_points * 100
-                # print(f'Progress: {progress:.2f}%', end='\r')
                 p = np.array([x, y, z])
-                # new_line = [x, y, z]
                 new_line = interpolate_point(
                     p, df, rad_arr, theta_arr, phi_arr, idx_point_map
                 )
                 data.append(new_line)
-    return np.concatenate(data)
+    return np.array(data)
 
 
 def process_line(line):
@@ -77,7 +70,8 @@ def interpolate_grids(input_file, df):
             start = time.time()
             new_grid, output_file = process_line(line)
             interpolated_grid = interpolate_grid(new_grid, df)
-            # np.savetxt(output_dir + output_file, interpolated_grid)
+            IGDF = pd.DataFrame(interpolated_grid, columns=df.columns)
+            IGDF.to_hdf( args.data_folder + output_dir + "dataframe_" + output_file + ".h5", key="df", mode="w")
             nx, ny, nz = new_grid[6:9]
             ntot = nx * ny * nz
             with open(args.data_folder + output_dir + output_file, "wb") as f:
@@ -86,11 +80,7 @@ def interpolate_grids(input_file, df):
             print(f"File '{output_file}' created in {time.time() - start} seconds")
 
 
-s3 = time.time()
 
 gridfile = "grids_bh_disk_patrik"
 interpolate_grids(gridfile, df)
 print("interpolation finished")
-### For test purposes
-# input_file = 'patryk_grids/test.txt'
-# interpolate_grids(input_file, df)
