@@ -70,12 +70,18 @@ def interpolate_grids(input_file, df):
             start = time.time()
             new_grid, output_file = process_line(line)
             interpolated_grid = interpolate_grid(new_grid, df)
-            IGDF = pd.DataFrame(interpolated_grid, columns=df.columns)
+            newcols = ["x","y","z"] + list(df.columns[3:])
+            tmpdfdata= {}
+            for i, c in enumerate(newcols):
+                tmpdfdata[c] = interpolated_grid[:, i]
+            #newcols.append(df.columns[2:])
+            IGDF = pd.DataFrame(tmpdfdata)
             IGDF.to_hdf(
                 args.data_folder + output_dir + "dataframe_" + output_file + ".h5",
                 key="df",
                 mode="w",
             )
+            interpolated_grid = interpolated_grid[:, 3:]
             nx, ny, nz = new_grid[6:9]
             ntot = nx * ny * nz
             with open(args.data_folder + output_dir + output_file, "wb") as f:
