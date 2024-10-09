@@ -71,11 +71,11 @@ def interpolate_grids(input_file, df):
             start = time.time()
             new_grid, output_file = process_line(line)
             interpolated_grid = interpolate_grid(new_grid, df)
-            newcols = ["x","y","z"] + list(df.columns[3:])
-            tmpdfdata= {}
+            newcols = ["x", "y", "z"] + list(df.columns[3:])
+            tmpdfdata = {}
             for i, c in enumerate(newcols):
                 tmpdfdata[c] = interpolated_grid[:, i]
-            #newcols.append(df.columns[2:])
+            # newcols.append(df.columns[2:])
             IGDF = pd.DataFrame(tmpdfdata)
             IGDF.to_hdf(
                 args.data_folder + output_dir + "dataframe_" + output_file + ".h5",
@@ -90,12 +90,13 @@ def interpolate_grids(input_file, df):
                 f.write(interpolated_grid.astype(np.float64).tobytes())
             print(f"File '{output_file}' created in {time.time() - start} seconds")
 
+
 def grid_writer(line, df):
     start = time.time()
     new_grid, output_file = process_line(line)
     interpolated_grid = interpolate_grid(new_grid, df)
-    newcols = ["x","y","z"] + list(df.columns[3:])
-    tmpdfdata= {}
+    newcols = ["x", "y", "z"] + list(df.columns[3:])
+    tmpdfdata = {}
     for i, c in enumerate(newcols):
         tmpdfdata[c] = interpolated_grid[:, i]
     IGDF = pd.DataFrame(tmpdfdata)
@@ -113,9 +114,10 @@ def grid_writer(line, df):
     print(f"File '{output_file}' created in {time.time() - start} seconds")
     return
 
+
 gridfile = "grids_bh_disk_patrik"
-with open(gridfile, 'r') as f:
+with open(gridfile, "r") as f:
     lines = f.readlines()
     r = Parallel(n_jobs=-1)(delayed(grid_writer)(l, df) for l in lines)
-#interpolate_grids(gridfile, df)
+# interpolate_grids(gridfile, df)
 print("interpolation finished")

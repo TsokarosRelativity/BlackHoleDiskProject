@@ -69,7 +69,7 @@ def spherical2cart(r, t, p):
 
 
 def interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map):
-    surroundingpoints = locate_point(rad_arr, theta_arr, phi_arr, p) # numpy array
+    surroundingpoints = locate_point(rad_arr, theta_arr, phi_arr, p)  # numpy array
     carpointdata = []
     scalardata = []
     for point in surroundingpoints:
