@@ -4,7 +4,7 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser(
-    prog="Calc Vars: Updated Jacobian",
+    prog="Calc 3D Vars: Routine v2",
     description="2D -> 3D Initial Data: Calculate Variables Routine",
     epilog="Routine takes in 2D initial data and converts 2D spherical initial data into 3D cartesian initial data",
 )
@@ -92,6 +92,7 @@ df["b2"] = df["b2"].apply(lambda x: max(x, 0))
 df_temp = df.copy()
 df_temp["theta"] = np.pi - df_temp["theta"]
 df = pd.concat([df, df_temp]).reset_index(drop=True)
+df = df.drop_duplicates()
 s3 = time.time()
 
 if args.v:
@@ -470,90 +471,100 @@ if args.v:
     print("-----------------------------------------------")
 
 
-# populating below the horizon
-s9 = time.time()
-horizondf = df.copy()
 
-horizondf = horizondf[~(np.abs(horizondf.r - rs) < 0.00001)]
-horizondf["r"] = horizondf["r"].apply(lambda x: (rs**2) / x)
-horizondf["alpha"] = -horizondf["alpha"]
-horizondf["u__z"] = -horizondf["u__z"]
-horizondf["u__x"] = -horizondf["u__x"]
-horizondf["u__y"] = -horizondf["u__y"]
+ret_df = df[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
 
-dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
-s10 = time.time()
-if args.v:
-    print(f"data under the horizon has been populated in {s10 - s9} seconds")
-# Save the necessary values
-# ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
-ret_df = dfall[
-    [
-        "r",
-        "theta",
-        "phi",
-        "alpha",
-        "beta__x",
-        "beta__y",
-        "beta__z",
-        "psi",
-        "gxx",
-        "gxy",
-        "gxz",
-        "gyy",
-        "gyz",
-        "gzz",
-        "Kxx",
-        "Kxy",
-        "Kxz",
-        "Kyy",
-        "Kyz",
-        "Kzz",
-        "rho",
-        "u__x",
-        "u__y",
-        "u__z",
-        "A_x",
-        "A_y",
-        "A_z",
-    ]
-]
+ret_df = ret_df.drop_duplicates()
 
-origin = {
-    "r": [np.float64(0)],
-    "theta": [np.float64(0)],
-    "phi": [np.float64(0)],
-    "alpha": [np.float64(1)],
-    "beta__x": [np.float64(0)],
-    "beta__y": [np.float64(0)],
-    "beta__z": [np.float64(0)],
-    "psi": [np.float64(1)],
-    "gxx": [np.float64(1)],
-    "gxy": [np.float64(0)],
-    "gxz": [np.float64(0)],
-    "gyy": [np.float64(1)],
-    "gyz": [np.float64(0)],
-    "gzz": [np.float64(1)],
-    "Kxx": [np.float64(0)],
-    "Kxy": [np.float64(0)],
-    "Kxz": [np.float64(0)],
-    "Kyy": [np.float64(0)],
-    "Kyz": [np.float64(0)],
-    "Kzz": [np.float64(0)],
-    "rho": [np.float64(0)],
-    "u__x": [np.float64(0)],
-    "u__y": [np.float64(0)],
-    "u__z": [np.float64(0)],
-    "A_x": [np.float64(0)],
-    "A_y": [np.float64(0)],
-    "A_z": [np.float64(0)],
-}
 
-origin_df = pd.DataFrame(origin)
-ret_df = pd.concat([ret_df, origin_df], axis=0, ignore_index=True)
+ret_df.to_hdf(args.folder + "3D_data/nonhorizondata_v2calc.h5", key="df", mode="w")
+
+
+#
+## populating below the horizon
+#s9 = time.time()
+#horizondf = df.copy()
+#
+#horizondf = horizondf[~(np.abs(horizondf.r - rs) < 0.00001)]
+#horizondf["r"] = horizondf["r"].apply(lambda x: (rs**2) / x)
+#horizondf["alpha"] = -horizondf["alpha"]
+#horizondf["u__z"] = -horizondf["u__z"]
+#horizondf["u__x"] = -horizondf["u__x"]
+#horizondf["u__y"] = -horizondf["u__y"]
+#
+#dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
+#s10 = time.time()
+#if args.v:
+#    print(f"data under the horizon has been populated in {s10 - s9} seconds")
+## Save the necessary values
+## ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
+#ret_df = dfall[
+#    [
+#        "r",
+#        "theta",
+#        "phi",
+#        "alpha",
+#        "beta__x",
+#        "beta__y",
+#        "beta__z",
+#        "psi",
+#        "gxx",
+#        "gxy",
+#        "gxz",
+#        "gyy",
+#        "gyz",
+#        "gzz",
+#        "Kxx",
+#        "Kxy",
+#        "Kxz",
+#        "Kyy",
+#        "Kyz",
+#        "Kzz",
+#        "rho",
+#        "u__x",
+#        "u__y",
+#        "u__z",
+#        "A_x",
+#        "A_y",
+#        "A_z",
+#    ]
+#]
+
+#origin = {
+#    "r": [np.float64(0)],
+#    "theta": [np.float64(0)],
+#    "phi": [np.float64(0)],
+#    "alpha": [np.float64(1)],
+#    "beta__x": [np.float64(0)],
+#    "beta__y": [np.float64(0)],
+#    "beta__z": [np.float64(0)],
+#    "psi": [np.float64(1)],
+#    "gxx": [np.float64(1)],
+#    "gxy": [np.float64(0)],
+#    "gxz": [np.float64(0)],
+#    "gyy": [np.float64(1)],
+#    "gyz": [np.float64(0)],
+#    "gzz": [np.float64(1)],
+#    "Kxx": [np.float64(0)],
+#    "Kxy": [np.float64(0)],
+#    "Kxz": [np.float64(0)],
+#    "Kyy": [np.float64(0)],
+#    "Kyz": [np.float64(0)],
+#    "Kzz": [np.float64(0)],
+#    "rho": [np.float64(0)],
+#    "u__x": [np.float64(0)],
+#    "u__y": [np.float64(0)],
+#    "u__z": [np.float64(0)],
+#    "A_x": [np.float64(0)],
+#    "A_y": [np.float64(0)],
+#    "A_z": [np.float64(0)],
+#}
+
+#origin_df = pd.DataFrame(origin)
+#ret_df = pd.concat([ret_df, origin_df], axis=0, ignore_index=True)
 
 # dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
-ret_df.to_hdf(args.folder + "3D_data/all_data_updated_jacobian.h5", key="df", mode="w")
+#ret_df.to_hdf(args.folder + "3D_data/all_data_updated_jacobian.h5", key="df", mode="w")
 
 
 if args.v:

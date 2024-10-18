@@ -92,6 +92,7 @@ df["b2"] = df["b2"].apply(lambda x: max(x, 0))
 df_temp = df.copy()
 df_temp["theta"] = np.pi - df_temp["theta"]
 df = pd.concat([df, df_temp]).reset_index(drop=True)
+df = df.drop_duplicates()
 s3 = time.time()
 
 if args.v:
@@ -472,6 +473,7 @@ if args.v:
 
 # populating below the horizon
 s9 = time.time()
+df = df.drop_duplicates()
 horizondf = df.copy()
 
 horizondf = horizondf[~(np.abs(horizondf.r - rs) < 0.00001)]
@@ -482,6 +484,8 @@ horizondf["u__x"] = -horizondf["u__x"]
 horizondf["u__y"] = -horizondf["u__y"]
 
 dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
+
+dfall = dfall.drop_duplicates()
 s10 = time.time()
 if args.v:
     print(f"data under the horizon has been populated in {s10 - s9} seconds")
@@ -552,8 +556,9 @@ origin = {
 origin_df = pd.DataFrame(origin)
 ret_df = pd.concat([ret_df, origin_df], axis=0, ignore_index=True)
 
+ret_df = ret_df.drop_duplicates(subset=["r", "theta", "phi"], keep="last")
 # dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
-ret_df.to_hdf(args.folder + "3D_data/all_data_updated_jacobian.h5", key="df", mode="w")
+ret_df.to_hdf(args.folder + "3D_data/all_data_routine1.h5", key="df", mode="w")
 
 
 if args.v:
