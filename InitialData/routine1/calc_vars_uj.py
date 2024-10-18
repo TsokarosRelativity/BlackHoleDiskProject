@@ -556,7 +556,7 @@ origin = {
 origin_df = pd.DataFrame(origin)
 ret_df = pd.concat([ret_df, origin_df], axis=0, ignore_index=True)
 
-ret_df = ret_df.drop_duplicates(subset=["r", "theta", "phi"], keep="last")
+ret_df = ret_df.drop_duplicates()
 # dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
 ret_df.to_hdf(args.folder + "3D_data/all_data_routine1.h5", key="df", mode="w")
 
