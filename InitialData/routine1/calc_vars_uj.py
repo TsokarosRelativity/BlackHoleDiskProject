@@ -491,6 +491,9 @@ if args.v:
     print(f"data under the horizon has been populated in {s10 - s9} seconds")
 # Save the necessary values
 # ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
+
+ret_df.to_hdf(args.folder + "3D_data/3d_datadump_routine1.h5", key="df", mode="w")
+
 ret_df = dfall[
     [
         "r",
