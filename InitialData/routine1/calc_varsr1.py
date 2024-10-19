@@ -13,13 +13,6 @@ parser.add_argument(
     type=str,
     help="args.folder in which the Initial Data is being stored and calculated",
 )
-
-parser.add_argument(
-    "data",
-    type=str,
-    help="args.data in which the 2d Initial Data is being stored and calculated",
-)
-
 parser.add_argument(
     "--v", action="store_true", help="showing details while running routine"
 )
@@ -32,7 +25,7 @@ if args.v:
 
 
 ######### INPUTS ###########################
-file_path = args.data + "all_vars.dat"
+file_path = "2D_data/all_vars.dat"
 rs = np.float64(0.3)
 n_phi = 100
 
@@ -497,12 +490,11 @@ s10 = time.time()
 if args.v:
     print(f"data under the horizon has been populated in {s10 - s9} seconds")
 # Save the necessary values
+# ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
 
+#ret_df.to_hdf(args.folder + "3D_data/3d_datadump_routine1.h5", key="df", mode="w")
 
-ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
-
-dfall.to_hdf(args.folder + "3D_data/" + args.data + "3d_datadump_routine1.h5", key="df", mode="w")
-
+dfall.to_hdf(args.folder + "3D_data/r1_datadump.h5", key="df", mode="w")
 ret_df = dfall[
     [
         "r",
@@ -570,7 +562,7 @@ ret_df = pd.concat([ret_df, origin_df], axis=0, ignore_index=True)
 
 ret_df = ret_df.drop_duplicates()
 # dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
-ret_df.to_hdf(args.folder + "3D_data/" + args.data + "all_data_routine1.h5", key="df", mode="w")
+ret_df.to_hdf(args.folder + "3D_data/all_data_routine1.h5", key="df", mode="w")
 
 
 if args.v:
