@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import time
 import pandas as pd
+from scipy.interpolate import RegularGridInterpolator
+
 
 #### BH Horizon Radius r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
 kerrm = 1
@@ -60,6 +62,10 @@ def calc_weighted_average(points, scalar_vals, p):
     weights = weights.reshape((-1, 1))
     return np.sum(weights * scalar_vals, axis=0) / np.sum(weights)
 
+def interpolatevalues(points, scalar_vals, p):
+    interp = RegularGridInterpolator(points, scalar_vals)
+    return interp(p, method="cubic")
+
 
 def spherical2cart(r, t, p):
     x = r * np.sin(t) * np.cos(p)
@@ -81,5 +87,5 @@ def interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map):
         scalardata.append(rowdata[3:])
     carpointdata = np.array(carpointdata)
     scalardata = np.array(scalardata)
-    interpolateddata = calc_weighted_average(carpointdata, scalardata, p)
+    interpolateddata = interpolatevalues(carpointdata, scalardata, p)
     return np.hstack((p, interpolateddata))
