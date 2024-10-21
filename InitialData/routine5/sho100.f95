@@ -179,7 +179,7 @@ arotlaw = 0.0d0*kerrm
 
 ! Grid resolution:
 
-nr = 6000 
+nr = 800
 nt = 200
 
 
@@ -195,7 +195,7 @@ rho0 = 1.2d-4
 restart = 0
 
 ! The number of iteration in the main loop
-niter = 100000
+niter = 1000
 
 ! initial cuttoff parameter tcut
 pi = acos(-1.0d0)
@@ -355,14 +355,13 @@ allocate(warisco    (nrr))
 pi = acos(-1.0d0)
 
 rin = rs
-!dr  = rin/50.0d0
-dr = 0.125d0
-!fac = 1.01d0
+dr  = rin/50.0d0
+fac = 1.01d0
 
 r(1) = rin
 
 do i = 2, nrr
-   r(i) = r(i - 1) + dr 
+   r(i) = r(1) + (fac**(i-1) - 1.0d0)*dr/(fac - 1.0d0)
 end do
 
 do i = 1, nrr
@@ -374,9 +373,9 @@ open(69, file="all_rvalues.dat", form="formatted")
 
 write(69, *) 'i, r(i), dr(i)'
 write(69, *)
-write(69, *) 1, rin
+write(69, *) 1, rin, 0.0d0
 do i = 2, nrr
-    write(69,*) i, r(i)  
+    write(69,*) i, r(i),  (fac**(i-1) - 1.0d0)*dr/(fac - 1.0d0)
     write(69,*)
 end do
 close(69)
