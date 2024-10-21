@@ -1,6 +1,6 @@
 #!/bin/bash
 
-exec 3>&1 1>>"../../Logs/LogFile_$(date +"%B_%d_%Y_%H-%M").txt" 2>&1
+exec 3>&1 1>>"../Logs/LogFile_$(date +"%B_%d_%Y_%H-%M").txt" 2>&1
 
 echo "======BLACK HOLE DISK: INITIAL DATA GENERATION ROUTINE======"
 
@@ -38,5 +38,12 @@ cd 2D_data/
 ./sho100
 cd ../../
  
+
+# Generate 3D data and perform necessary variable calculations
+echo "------------------------"
+echo "generating 3D initial data..."
+python calc_vars_uj.py "$(date +"%B_%d_%Y_%H-%M")" -v
+echo "generating interpolated data"
+python interpolate_grid.py "$(date +"%B_%d_%Y_%H-%M")" 
 
 echo "====END===="
