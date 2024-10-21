@@ -54,7 +54,7 @@ def locate_point(
 
 def calc_weighted_average(points, scalar_vals, p):
     d = np.sum((points - p) ** 2, axis=1)
-    if any(d <= 1e-6):
+    if any(d <= 1e-4):
         return scalar_vals[np.argmin(d)]
     weights = 1 / ((d) ** 2)
     weights = weights.reshape((-1, 1))
