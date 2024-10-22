@@ -53,7 +53,7 @@ def locate_point(
 
 
 def calcaverage(points, scalar_vals, p):
-    d = np.sum((points - p) ** 2, axis=1)
+    d = np.sum((points - p) , axis=1)
     if any(d <= 1e-3):
         return scalar_vals[np.argmin(d)]
     return np.sum(scalar_vals, axis=0) / points.size
