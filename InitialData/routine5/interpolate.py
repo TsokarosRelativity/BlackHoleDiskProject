@@ -56,7 +56,7 @@ def calcaverage(points, scalar_vals, p):
     d = np.sum((points - p) , axis=1)
     if any(d <= 1e-3):
         return scalar_vals[np.argmin(d)]
-    return np.sum(scalar_vals, axis=0) / points.size
+    return np.sum(scalar_vals, axis=0) / points.shape[0]
 
 
 def spherical2cart(r, t, p):
