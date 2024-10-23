@@ -74,6 +74,7 @@ def locate_point(
                     combinations.append([tmpr, tmpt, tmpp])
     return np.array(combinations)
 
+
 @njit(parallel=True)
 def calc_weighted_average(points, scalar_vals, p):
     d = np.sum((points - p) ** (1 / 2), axis=1)
