@@ -23,7 +23,7 @@ output_dir = "processed_grids/"  ##end with /
 
 print("LOADING IN DATA")
 s1 = time.time()
-df = pd.read_hdf(args.data_folder + "3D_data/all_data_updated_jacobian.h5", key="df")
+df = pd.read_hdf(args.data_folder + "3D_data/all_data_routine1.h5", key="df")
 print(f"loaded data in {time.time() - s1} sec")
 
 print("PREPROCESSING DATA")
