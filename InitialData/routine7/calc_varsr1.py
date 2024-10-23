@@ -481,8 +481,7 @@ horizondf["r"] = horizondf["r"].apply(lambda x: (rs**2) / x)
 horizondf["alpha"] = -horizondf["alpha"]
 
 
-
-#horizondf["u__z"] = -horizondf["u__z"]
+# horizondf["u__z"] = -horizondf["u__z"]
 horizondf["u__x"] = -horizondf["u__x"]
 horizondf["u__y"] = -horizondf["u__y"]
 
@@ -495,7 +494,7 @@ if args.v:
 # Save the necessary values
 # ret_df = dfall[['r', 'theta', 'phi', 'alpha', 'beta__x', 'beta__y', 'beta__z', 'psi', 'gxx', 'gxy', 'gxz', 'gyy', 'gyz', 'gzz', 'Kxx', 'Kxy', 'Kxz', 'Kyy', 'Kyz', 'Kzz', 'rho', 'u__x', 'u__y', 'u__z']]
 
-#ret_df.to_hdf(args.folder + "3D_data/3d_datadump_routine1.h5", key="df", mode="w")
+# ret_df.to_hdf(args.folder + "3D_data/3d_datadump_routine1.h5", key="df", mode="w")
 
 dfall.to_hdf(args.folder + "3D_data/r1_datadump.h5", key="df", mode="w")
 ret_df = dfall[
