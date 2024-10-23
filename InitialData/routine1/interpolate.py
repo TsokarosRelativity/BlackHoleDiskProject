@@ -127,7 +127,7 @@ def calc_weighted_average(points, scalar_vals, p):
     return np.sum(weights * scalar_vals, axis=0) / np.sum(weights)
 
 
-@njit(parallel=True)
+@njit
 def spherical2cart(r, t, p):
     x = r * np.sin(t) * np.cos(p)
     y = r * np.sin(t) * np.sin(p)
