@@ -4,6 +4,7 @@ from interpolate import *
 import time
 import argparse
 from joblib import Parallel, delayed
+from numba import njit, jit
 
 parser = argparse.ArgumentParser(
     prog="Interpolation Routine",
