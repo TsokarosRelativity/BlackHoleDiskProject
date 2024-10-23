@@ -40,7 +40,6 @@ idx_point_map = {
 print(f"processed data in {time.time() - s2} sec")
 
 
-@njit(parallel=True)
 def interpolate_grid(new_grid, df):
     ### generate new grid
     x_min, y_min, z_min, dx, dy, dz, Nx, Ny, Nz, MPI_ID = new_grid
