@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from numba import njit, prange
+from numba import njit
 
 
 #### BH Horizon Radius r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
@@ -29,49 +29,39 @@ def locate_point(
     ps = np.zeros(4, dtype=np.float64)
     rs = np.zeros(2, dtype=np.float64)
     ep = np.array([phi_arr[-2], phi_arr[1]])
-    tcount = 0
-    pcount = 0
-    rcount = 2
 
-    for i in prange(1, len(phi_arr_extended) - 1):
+    for i in range(1, len(phi_arr_extended) - 1):
         if phi_0 == phi_arr_extended[i]:
             ps[0] = phi_arr_extended[i - 1]
             ps[1] = phi_arr_extended[i + 1]
-            pcount += 2
             break
         if phi_arr_extended[i] < phi_0 < phi_arr_extended[i + 1]:
             ps[0] = phi_arr_extended[i]
             ps[1] = phi_arr_extended[i + 1]
-            pcount += 2
             break
 
     if theta_0 == theta_arr[0]:
         ts[0] = theta_arr[1]
-        tcount += 1
         skip = True
     if theta_0 == theta_arr[-1]:
         ts[0] = theta_arr[-2]
-        tcount +=1
         skip = True
     if skip:
         ps[2] = ep[0] - ps[0]
         ps[3] = ep[1] - ps[1]
-        pcount += 2
 
     if not skip:
-        for i in prange(len(theta_arr)):
+        for i in range(len(theta_arr)):
             if theta_0 == theta_arr[i]:
                 ts[0] = theta_arr[i - 1]
                 ts[1] = theta_arr[i + 1] 
-                tcount += 2
                 break
             if theta_arr[i] < theta_0 < theta_arr[i + 1]:
                 ts[0] = theta_arr[i]
                 ts[1] = theta_arr[i + 1]
-                tcount += 2
                 break
 
-    for i in prange(len(r_arr)):
+    for i in range(len(r_arr)):
         if r_0 == r_arr[i]:
             if i == 0:
                 rs[0] = r_arr[i]
