@@ -14,54 +14,68 @@ def locate_point(
     r_arr, theta_arr, phi_arr, p
 ):  # r_arr, theta_arr, phi_arr define the ID grid, p defines a point in the new grid
     # p should be a tuple (x,y,z) in cartesian coords
-    phi_arr = np.append(phi_arr[-2], np.append(phi_arr, phi_arr[1]))
+    phi_arr_extended = np.zeros(len(phi_arr) + 2, dtype=np.float64)
+    phi_arr_extended[0] = phi_arr[-2]
+    phi_arr_extended[1:-1] = phi_arr
+    phi_arr_extended[-1] = phi_arr[1]    
     x, y, z = p
     r_0 = np.sqrt(x**2 + y**2 + z**2)
     theta_0 = np.arccos(z / r_0)
     skip = False
     phi_0 = np.arctan2(y, x)
     phi_0 = phi_0 % (2 * np.pi)  # ensures phi takes values between [0,2pi]
-    rs, ts, ps = [], [], []
+    ts = np.zeros(2, dtype=np.float64)
+    ps = np.zeros(2, dtype=np.float64)
+    rs = np.zeros(2, dtype=np.float64)
+    ep = np.array([phi_arr[-2], phi_arr[1]])
 
-    for i in prange(1, len(phi_arr) - 1):
-        if phi_0 == phi_arr[i]:
-            ps = [phi_arr[i - 1], phi_arr[i + 1]]
+    for i in prange(1, len(phi_arr_extended) - 1):
+        if phi_0 == phi_arr_extended[i]:
+            ps[0] = phi_arr_extended[i - 1]
+            ps[1] = phi_arr_extended[i + 1]
             break
-        if phi_arr[i] < phi_0 < phi_arr[i + 1]:
-            ps = [phi_arr[i], phi_arr[i + 1]]
+        if phi_arr_extended[i] < phi_0 < phi_arr_extended[i + 1]:
+            ps[0] = phi_arr_extended[i]
+            ps[1] = phi_arr_extended[i + 1]
             break
-    ps = np.array(ps)
 
     if theta_0 == theta_arr[0]:
         ts = [theta_arr[1]]
         skip = True
-        ps = np.append(ps, [phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]])
     if theta_0 == theta_arr[-1]:
         ts = [theta_arr[-2]]
-        ps = np.append(ps, [phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]])
         skip = True
+    if skip:
+        tmp = np.zeros(4, dtype=np.float64)
+        tmp[0] = ps[0]
+        tmp[1] = ps[1]
+        tmp[2] = ep[0]
+        tmp[3] = ep[1]
+        ps = tmp
     if not skip:
         for i in prange(len(theta_arr)):
             if theta_0 == theta_arr[i]:
-                ts = (theta_arr[i - 1], theta_arr[i + 1])
+                ts[0] = theta_arr[i - 1]
+                ts[1] = theta_arr[i + 1] 
                 break
             if theta_arr[i] < theta_0 < theta_arr[i + 1]:
-                ts = (theta_arr[i], theta_arr[i + 1])
+                ts[0] = theta_arr[i]
+                ts[1] = theta_arr[i + 1]
                 break
-    ts = np.array(ts)
+
     for i in prange(len(r_arr)):
         if r_0 == r_arr[i]:
             if i == 0:
                 rs = [r_arr[i], r_arr[1]]
                 break
             else:
-                rs = (r_arr[i - 1], r_arr[i + 1])
+                rs = [r_arr[i - 1], r_arr[i + 1]]
                 break
         if r_arr[i] < r_0 < r_arr[i + 1]:
-            rs = (r_arr[i], r_arr[i + 1])
+            rs = [r_arr[i], r_arr[i + 1]]
             break
-    rs = np.array(rs)
     combinations = []
+
     if rs[0] == r_arr[0]:
         combinations.append([np.float64(0), np.float64(0), np.float64(0)])
         for tmpt in ts:
