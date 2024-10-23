@@ -8,6 +8,7 @@ kerrm = 1
 kerra = 0.8
 r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
 
+
 @njit(parallel=True)
 def locate_point(
     r_arr, theta_arr, phi_arr, p
@@ -24,7 +25,7 @@ def locate_point(
 
     for i in prange(1, len(phi_arr) - 1):
         if phi_0 == phi_arr[i]:
-            ps = [phi_arr[i-1], phi_arr[i + 1]]
+            ps = [phi_arr[i - 1], phi_arr[i + 1]]
             break
         if phi_arr[i] < phi_0 < phi_arr[i + 1]:
             ps = [phi_arr[i], phi_arr[i + 1]]
@@ -73,12 +74,13 @@ def locate_point(
 
 @njit(parallel=True)
 def calc_weighted_average(points, scalar_vals, p):
-    d = np.sum((points - p)**(1/2), axis=1)
+    d = np.sum((points - p) ** (1 / 2), axis=1)
     if any(d <= 1e-7):
         return scalar_vals[np.argmin(d)]
-    weights = 1 /d
+    weights = 1 / d
     weights = weights.reshape((-1, 1))
     return np.sum(weights * scalar_vals, axis=0) / np.sum(weights)
+
 
 @njit(parallel=True)
 def spherical2cart(r, t, p):
