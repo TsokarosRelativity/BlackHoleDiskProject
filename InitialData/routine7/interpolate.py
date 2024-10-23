@@ -14,7 +14,7 @@ def locate_point(
     r_arr, theta_arr, phi_arr, p
 ):  # r_arr, theta_arr, phi_arr define the ID grid, p defines a point in the new grid
     # p should be a tuple (x,y,z) in cartesian coords
-    np.append(phi_arr[-2], np.append(phi_arr, phi_arr[1]))
+    phi_arr = np.append(phi_arr[-2], np.append(phi_arr, phi_arr[1]))
     x, y, z = p
     r_0 = np.sqrt(x**2 + y**2 + z**2)
     theta_0 = np.arccos(z / r_0)
@@ -30,13 +30,15 @@ def locate_point(
         if phi_arr[i] < phi_0 < phi_arr[i + 1]:
             ps = [phi_arr[i], phi_arr[i + 1]]
             break
+    ps = np.array(ps)
+
     if theta_0 == theta_arr[0]:
         ts = [theta_arr[1]]
         skip = True
-        ps.append([phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]])
+        ps = np.append(ps, [phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]])
     if theta_0 == theta_arr[-1]:
         ts = [theta_arr[-2]]
-        ps.append([phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]])
+        ps = np.append(ps, [phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]])
         skip = True
     if not skip:
         for i in prange(len(theta_arr)):
@@ -46,6 +48,7 @@ def locate_point(
             if theta_arr[i] < theta_0 < theta_arr[i + 1]:
                 ts = (theta_arr[i], theta_arr[i + 1])
                 break
+    ts = np.array(ts)
     for i in prange(len(r_arr)):
         if r_0 == r_arr[i]:
             if i == 0:
@@ -57,7 +60,7 @@ def locate_point(
         if r_arr[i] < r_0 < r_arr[i + 1]:
             rs = (r_arr[i], r_arr[i + 1])
             break
-
+    rs = np.array(rs)
     combinations = []
     if rs[0] == r_arr[0]:
         combinations.append([np.float64(0), np.float64(0), np.float64(0)])
@@ -70,7 +73,6 @@ def locate_point(
                 for tmpp in ps:
                     combinations.append([tmpr, tmpt, tmpp])
     return np.array(combinations)
-
 
 @njit(parallel=True)
 def calc_weighted_average(points, scalar_vals, p):
