@@ -4,7 +4,6 @@ from interpolate import *
 import time
 import argparse
 from joblib import Parallel, delayed
-from numba import njit, jit
 
 parser = argparse.ArgumentParser(
     prog="Interpolation Routine",
@@ -40,7 +39,6 @@ idx_point_map = {
 print(f"processed data in {time.time() - s2} sec")
 
 
-@njit(parallel=True)
 def interpolate_grid(new_grid, df):
     ### generate new grid
     x_min, y_min, z_min, dx, dy, dz, Nx, Ny, Nz, MPI_ID = new_grid

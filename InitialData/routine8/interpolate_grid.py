@@ -3,8 +3,6 @@ import pandas as pd
 from interpolate import *
 import time
 import argparse
-from joblib import Parallel, delayed
-from numba import njit, jit
 
 parser = argparse.ArgumentParser(
     prog="Interpolation Routine",
@@ -25,7 +23,7 @@ output_dir = "processed_grids/"  ##end with /
 
 print("LOADING IN DATA")
 s1 = time.time()
-df = pd.read_hdf(args.data_folder + "3D_data/all_data_routine1.h5", key="df")
+df = pd.read_hdf(args.data_folder + "3D_data/all_data_updated_jacobian.h5", key="df")
 print(f"loaded data in {time.time() - s1} sec")
 
 print("PREPROCESSING DATA")
@@ -40,7 +38,6 @@ idx_point_map = {
 print(f"processed data in {time.time() - s2} sec")
 
 
-@njit(parallel=True)
 def interpolate_grid(new_grid, df):
     ### generate new grid
     x_min, y_min, z_min, dx, dy, dz, Nx, Ny, Nz, MPI_ID = new_grid
@@ -93,33 +90,6 @@ def interpolate_grids(input_file, df):
             print(f"File '{output_file}' created in {time.time() - start} seconds")
 
 
-def grid_writer(line, df):
-    start = time.time()
-    new_grid, output_file = process_line(line)
-    interpolated_grid = interpolate_grid(new_grid, df)
-    newcols = ["x", "y", "z"] + list(df.columns[3:])
-    tmpdfdata = {}
-    for i, c in enumerate(newcols):
-        tmpdfdata[c] = interpolated_grid[:, i]
-    IGDF = pd.DataFrame(tmpdfdata)
-    IGDF.to_hdf(
-        args.data_folder + output_dir + "dataframe_" + output_file + ".h5",
-        key="df",
-        mode="w",
-    )
-    interpolated_grid = interpolated_grid[:, 3:]
-    nx, ny, nz = new_grid[6:9]
-    ntot = nx * ny * nz
-    with open(args.data_folder + output_dir + output_file, "wb") as f:
-        f.write(np.array([nx, ny, nz, ntot], dtype=np.int32).tobytes())
-        f.write(interpolated_grid.astype(np.float64).tobytes())
-    print(f"File '{output_file}' created in {time.time() - start} seconds")
-    return
-
-
 gridfile = "grids_bh_disk_patrik"
-with open(gridfile, "r") as f:
-    lines = f.readlines()
-    r = Parallel(n_jobs=-1)(delayed(grid_writer)(l, df) for l in lines)
-# interpolate_grids(gridfile, df)
+interpolate_grids(gridfile, df)
 print("interpolation finished")
