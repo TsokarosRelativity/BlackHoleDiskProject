@@ -9,7 +9,6 @@ kerra = 0.8
 r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
 
 
-@njit
 def locate_point(
     r_arr, theta_arr, phi_arr, p
 ):  # r_arr, theta_arr, phi_arr define the ID grid, p defines a point in the new grid
@@ -116,18 +115,15 @@ def locate_point(
     return combinations 
 
 
-@njit
 def calc_weighted_average(points, scalar_vals, p):
-    d = np.sum((points - p) ** (1 / 2), axis=1)
-    for i in range(len(d)):
-        if d[i] <= 1e-7:
-            return scalar_vals[i]    
+    d = np.sum(np.abs((points - p)) ** (1/2), axis=1)
+    if any(d <= 1e-3):
+        return scalar_vals[np.argmin(d)]
     weights = 1 / d
     weights = weights.reshape((-1, 1))
     return np.sum(weights * scalar_vals, axis=0) / np.sum(weights)
 
 
-@njit
 def spherical2cart(r, t, p):
     x = r * np.sin(t) * np.cos(p)
     y = r * np.sin(t) * np.sin(p)

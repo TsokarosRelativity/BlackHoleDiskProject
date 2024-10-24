@@ -103,10 +103,9 @@ def locate_point(
     return combinations 
 
 def calc_weighted_average(points, scalar_vals, p):
-    d = np.sum((points - p) ** (1 / 2), axis=1)
-    for i in range(len(d)):
-        if d[i] <= 1e-7:
-            return scalar_vals[i]    
+    d = np.sum(np.abs((points - p)) ** (1/2), axis=1)
+    if any(d <= 1e-3):
+        return scalar_vals[np.argmin(d)]
     weights = 1 / d
     weights = weights.reshape((-1, 1))
     return np.sum(weights * scalar_vals, axis=0) / np.sum(weights)

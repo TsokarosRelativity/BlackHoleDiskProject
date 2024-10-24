@@ -3,8 +3,7 @@ import pandas as pd
 from interpolate import *
 import time
 import argparse
-from joblib import Parallel, delayed
-from numba import njit, jit
+from joblib import Parallel, delayed, parallel_backend
 
 parser = argparse.ArgumentParser(
     prog="Interpolation Routine",
@@ -20,7 +19,7 @@ args = parser.parse_args()
 
 
 print("STARTING WOOHOO")
-output_dir = "processed_grids/"  ##end with /
+output_dir = "processed_grids_r2/"  ##end with /
 # output_file = 'test_data.3d'
 
 print("LOADING IN DATA")
@@ -119,6 +118,6 @@ def grid_writer(line, df):
 gridfile = "grids_bh_disk_patrik"
 with open(gridfile, "r") as f:
     lines = f.readlines()
-    r = Parallel(n_jobs=-1)(delayed(grid_writer)(l, df) for l in lines)
+    r = Parallel(n_jobs=-1, timeout=300)(delayed(grid_writer)(l, df) for l in lines)
 # interpolate_grids(gridfile, df)
 print("interpolation finished")
