@@ -7,104 +7,50 @@ kerrm = 1
 kerra = 0.8
 r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
 
-
-
-
-
-
-def locate_point(
-    r_arr, theta_arr, phi_arr, p
-):  # r_arr, theta_arr, phi_arr define the ID grid, p defines a point in the new grid
-    # p should be a tuple (x,y,z) in cartesian coords
-    phi_arr = np.append(phi_arr[-2], np.append(phi_arr, phi_arr[1]))
+def locate_point(r_arr, theta_arr, phi_arr, p):
     x, y, z = p
     r_0 = np.sqrt(x**2 + y**2 + z**2)
-    theta_0 = np.arccos(z / r_0)
-    skip = False
-    origin = False
-    phi_0 = np.arctan2(y, x)
-    phi_0 = phi_0 % (2 * np.pi)  # ensures phi takes values between [0,2pi]
-    ts = np.zeros(2, dtype=np.float64)
-    ps = np.zeros(2, dtype=np.float64)
-    rs = np.zeros(2, dtype=np.float64)
-    for i in range(1, len(phi_arr) - 1):
-        if phi_0 == phi_arr[i]:
-            ps[0] = phi_arr[i - 1]
-            ps[1] = phi_arr[i + 1]
-            break
-        if phi_arr[i] < phi_0 < phi_arr[i + 1]:
-            ps[0] = phi_arr[i]
-            ps[1] = phi_arr[i + 1]
-            break
-    if theta_0 == theta_arr[0]:
-        ts[0] = theta_arr[1]
-        ps = np.append(ps, np.array([phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]]))
-        skip = True
-    if theta_0 == theta_arr[-1]:
-        ts[0] = theta_arr[-2]
-        ps = np.append(ps, np.array([phi_arr[-2] - ps[0], phi_arr[-2] - ps[1]]))
-        skip = True
+    theta_0 = np.arccos(z / r_0) if r_0 != 0 else np.float64(0)
+    phi_0 = np.arctan2(y, x) % (2 * np.pi)
 
-    if not skip:
-        for i in range(len(theta_arr)):
-            if theta_0 == theta_arr[i]:
-                ts[0] = theta_arr[i - 1]
-                ts[1] = theta_arr[i + 1] 
-                break
-            if theta_arr[i] < theta_0 < theta_arr[i + 1]:
-                ts[0] = theta_arr[i]
-                ts[1] = theta_arr[i + 1]
-                break
+    # Find nearest indices
+    r_idx_1 = np.searchsorted(r_arr, r_0) - 1
+    r_idx_2 = np.searchsorted(r_arr, r_0, side="right")
+    theta_idx_1 = np.searchsorted(theta_arr, theta_0) - 1
+    theta_idx_2 = np.searchsorted(theta_arr, theta_0, side="right")
+    phi_idx_1 = np.searchsorted(phi_arr, phi_0) - 1
+    phi_idx_2 = np.searchsorted(phi_arr, phi_0, side="right")
+    
+    theta_edge_case = False
+    if theta_idx_1 == -1:
+        theta_idx_1 = 1
+        theta_edge_case = True
+    if theta_idx_2 == len(theta_arr) + 1:
+        theta_idx_2 = theta_idx_1
+        theta_edge_case = True
+    if phi_idx_1 == -1:
+        phi_idx_1 = len(phi_arr) - 2
+    if phi_idx_2 == len(phi_arr) + 1:
+        phi_idx_2 = 1
+    # Handle edge cases
 
-    for i in range(len(r_arr)):
-        if r_0 == r_arr[i]:
-            rs[0] = r_arr[i - 1]
-            rs[1] = r_arr[i + 1]
-            break
-        if r_arr[i] < r_0 < r_arr[i + 1]:
-            rs[0] = r_arr[i]
-            rs[1] = r_arr[i + 1]
-            break
-    tc = 8
-    if rs[0] == np.float64(0.0):
-        origin = True
-        tc = 5
+    # Get surrounding points
+    rs = [r_arr[r_idx_1], r_arr[r_idx_2]]
+    print(rs)
+    ts = [theta_arr[theta_idx_1], theta_arr[theta_idx_2]]
+    print(ts)
+    ps = [phi_arr[phi_idx_1], phi_arr[phi_idx_2]]
+    if theta_edge_case:
+        ps.append(phi_arr[-2] - ps[0]) 
+        ps.append(phi_arr[-2] - ps[1])
+    print(ps)
+    # Generate all combinations
+    combinations = np.array(np.meshgrid(rs, ts, ps)).T.reshape(-1, 3)
+    z = combinations[:, 0] == np.float64(0)
+    combinations[z] = np.array([np.float64(0), np.float64(0), np.float64(0)])
+    combinations = np.unique(combinations, axis=0)
+    return combinations
 
-    combinations = np.zeros((tc, 3), dtype=np.float64)
-
-    if origin:
-        combinations[0] = np.array([np.float64(0), np.float64(0), np.float64(0)])
-        if skip:
-            combinations[1] = np.array([rs[1], ts[0], ps[0]])
-            combinations[2] = np.array([rs[1], ts[0], ps[1]])
-            combinations[3] = np.array([rs[1], ts[0], ps[2]])
-            combinations[4] = np.array([rs[1], ts[0], ps[3]])
-        else:
-            combinations[1] = np.array([rs[1], ts[0], ps[0]])
-            combinations[2] = np.array([rs[1], ts[0], ps[1]])
-            combinations[3] = np.array([rs[1], ts[1], ps[0]])
-            combinations[4] = np.array([rs[1], ts[1], ps[1]])
-    else:
-        if skip:
-            combinations[0] = np.array([rs[0], ts[0], ps[0]])
-            combinations[1] = np.array([rs[0], ts[0], ps[1]])
-            combinations[2] = np.array([rs[0], ts[0], ps[2]])
-            combinations[3] = np.array([rs[0], ts[0], ps[3]])
-            combinations[4] = np.array([rs[1], ts[0], ps[0]])
-            combinations[5] = np.array([rs[1], ts[0], ps[1]])
-            combinations[6] = np.array([rs[1], ts[0], ps[2]])
-            combinations[7] = np.array([rs[1], ts[0], ps[3]])
-        else:
-            combinations[0] = np.array([rs[0], ts[0], ps[0]])
-            combinations[1] = np.array([rs[0], ts[0], ps[1]])
-            combinations[2] = np.array([rs[0], ts[1], ps[0]])
-            combinations[3] = np.array([rs[0], ts[1], ps[1]])
-            combinations[4] = np.array([rs[1], ts[0], ps[0]])
-            combinations[5] = np.array([rs[1], ts[0], ps[1]])
-            combinations[6] = np.array([rs[1], ts[1], ps[0]])
-            combinations[7] = np.array([rs[1], ts[1], ps[1]])
-
-    return combinations 
 
 def calc_weighted_average(points, scalar_vals, p):
     d = np.sum(np.abs((points - p)) ** (1/2), axis=1)
