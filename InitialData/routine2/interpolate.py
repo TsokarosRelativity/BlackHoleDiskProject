@@ -50,7 +50,7 @@ def locate_point(r_arr, theta_arr, phi_arr, p):
 
 
 def calc_weighted_average(points, scalar_vals, p):
-    d = np.sum(np.abs((points - p), axis=1)
+    d = np.sum(np.abs((points - p)), axis=1)
     if np.any(d <= 1e-6):
         return scalar_vals[np.argmin(d)]
     weights = 1 / d
