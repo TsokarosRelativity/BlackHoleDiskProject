@@ -195,7 +195,7 @@ rho0 = 1.2d-4
 restart = 0
 
 ! The number of iteration in the main loop
-niter = 1000
+niter = 10000
 
 ! initial cuttoff parameter tcut
 pi = acos(-1.0d0)
