@@ -8,6 +8,10 @@ kerra = 0.8
 r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
 
 
+
+
+
+
 def locate_point(
     r_arr, theta_arr, phi_arr, p
 ):  # r_arr, theta_arr, phi_arr define the ID grid, p defines a point in the new grid
