@@ -36,14 +36,11 @@ def locate_point(r_arr, theta_arr, phi_arr, p):
 
     # Get surrounding points
     rs = [r_arr[r_idx_1], r_arr[r_idx_2]]
-    print(rs)
     ts = [theta_arr[theta_idx_1], theta_arr[theta_idx_2]]
-    print(ts)
     ps = [phi_arr[phi_idx_1], phi_arr[phi_idx_2]]
     if theta_edge_case:
         ps.append(phi_arr[-2] - ps[0]) 
         ps.append(phi_arr[-2] - ps[1])
-    print(ps)
     # Generate all combinations
     combinations = np.array(np.meshgrid(rs, ts, ps)).T.reshape(-1, 3)
     z = combinations[:, 0] == np.float64(0)
