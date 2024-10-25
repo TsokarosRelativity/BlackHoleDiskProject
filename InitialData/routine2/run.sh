@@ -40,10 +40,10 @@ cd ../../
  
 
 # Generate 3D data and perform necessary variable calculations
-echo "------------------------"
-echo "generating 3D initial data..."
-python calc_vars_uj.py "$(date +"%B_%d_%Y_%H-%M")" -v
-echo "generating interpolated data"
-python interpolate_grid.py "$(date +"%B_%d_%Y_%H-%M")" 
+#echo "------------------------"
+#echo "generating 3D initial data..."
+#python calc_vars_uj.py "$(date +"%B_%d_%Y_%H-%M")" -v
+#echo "generating interpolated data"
+#python interpolate_grid.py "$(date +"%B_%d_%Y_%H-%M")" 
 
 echo "====END===="
