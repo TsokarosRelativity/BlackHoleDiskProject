@@ -129,7 +129,7 @@ df["J_12"] = -np.sqrt(df.x**2 + df.y**2) / df.r**2
 
 df["J_20"] = -np.sin(df.phi) / (df.r * np.sin(df.theta))
 df["J_21"] = np.cos(df.phi) / (df.r * np.sin(df.theta))
-df["J_22"] = np.floate(0)
+df["J_22"] = np.float64(0)
 
 df["zero"] = np.zeros(len(df), dtype=np.float64)
 
