@@ -129,7 +129,7 @@ df["J_12"] = -np.sqrt(df.x**2 + df.y**2) / df.r**2
 
 df["J_20"] = -np.sin(df.phi) / (df.r * np.sin(df.theta))
 df["J_21"] = np.cos(df.phi) / (df.r * np.sin(df.theta))
-df["J_22"] = 0
+df["J_22"] = np.floate(0)
 
 df["zero"] = np.zeros(len(df), dtype=np.float64)
 
@@ -146,7 +146,7 @@ df["K_rp"] = np.zeros(len(df), dtype=np.float64)
 df["K_tp"] = np.zeros(len(df), dtype=np.float64)
 
 cond1 = np.abs(df["r"] - rs) < 0.00001  # on horizon
-cond2 = df.z >= 0  # positive z
+cond2 = df.z >= np.float64(0)  # positive z
 
 df.loc[cond1, "K_rp"] = (df.He * np.sin(df.theta) ** 2) / (df.psi**2 * df.r**2)
 df.loc[cond1, "K_tp"] = (df.Hf * np.sin(df.theta)) / (df.psi**2 * df.r)
@@ -165,8 +165,8 @@ df.loc[(~cond1) & (~cond2), "K_tp"] = (df.Hf * np.sin(df.theta)) / (
 ) ** 2 * df.dbetatdt
 
 # Simplifying K expressions
-df["K_rp"] = df["K_rp"].apply(lambda x: x if not np.isnan(x) else 0)
-df["K_tp"] = df["K_tp"].apply(lambda x: x if not np.isnan(x) else 0)
+df["K_rp"] = df["K_rp"].apply(lambda x: x if not np.isnan(x) else np.float64(0))
+df["K_tp"] = df["K_tp"].apply(lambda x: x if not np.isnan(x) else np.float64(0))
 
 # Assemble conformal 3-metric in spherical coords (covariant form)
 df["gamma_00"] = df.psi**4 * np.exp(2 * df.q)  # gamma_rr
@@ -180,8 +180,8 @@ df["gamma__22"] = 1 / df["gamma_22"]
 
 # Calc Fluid Velocity (These are upper indices indicated by two lower '__')
 df["u__t"] = np.zeros(len(df), dtype=np.float64)
-df.loc[(df.rho == 0), "u__t"] = 0.0
-df.loc[~(df.rho == 0), "u__t"] = (
+df.loc[(df.rho == np.float64(0)), "u__t"] = 0.0
+df.loc[~(df.rho == np.float64(0)), "u__t"] = (
     df.alpha**2 - df.gamma_22 * (df.Omega + df.beta) ** 2
 ) ** (-1 / 2)
 df["u__phi"] = df.Omega * df.u__t
@@ -200,11 +200,11 @@ df["b_t"] = -df.Omega * df.b2_phi ** (1 / 2)
 df["b_phi"] = df.b__phi * df.gamma_22  # Convert upper index to lower index
 
 # Convert Units
-G = 6.674 * 10 ** (-11)  # gravitational constant in SI units
-c = 3 * 10 ** (8)  # speed of light in SI units
-epsilon_0 = 8.854 * 10 ** (-12)  # permitivity of free space in SI units
+G = np.float64(6.674) * np.float64(10) ** (-11)  # gravitational constant in SI units
+c = np.float64(3) * np.float64(10) ** (8)  # speed of light in SI units
+epsilon_0 = np.float64(8.854) * np.float64(10) ** (-12)  # permitivity of free space in SI units
 unit_conv = (
-    G ** (1 / 2) * c ** (-1) * epsilon_0 ** (-1 / 2) * 10 ** (4)
+    G ** (1 / 2) * c ** (-1) * epsilon_0 ** (-1 / 2) * np.float64(10) ** (4)
 )  # conversion from geometrized units for magnetic B field to Gauss (CGS units)
 
 df["B__x"] = (
@@ -469,6 +469,7 @@ if args.v:
 
 # populating below the horizon
 s9 = time.time()
+df = df.map(lambda x: np.float64(0) if abs(x) <= 1e-10 else x)
 df = df.drop_duplicates()
 horizondf = df.copy()
 

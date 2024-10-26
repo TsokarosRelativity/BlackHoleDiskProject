@@ -31,9 +31,9 @@ def locate_point(r_arr, theta_arr, phi_arr, p):
         phi_idx_1 = len(phi_arr) - 1
     if phi_idx_2 == len(phi_arr):
         phi_idx_2 = 0
+    if phi_idx_1 == len(phi_arr):
+        phi_idx_1 = len(phi_arr) - 1
     # Handle edge cases
-    print("indexes for point: ", p)
-    print(r_idx_1, r_idx_2, theta_idx_1, theta_idx_2, phi_idx_1, phi_idx_2)
     # Get surrounding points
     rs = [r_arr[r_idx_1], r_arr[r_idx_2]]
     ts = [theta_arr[theta_idx_1], theta_arr[theta_idx_2]]
