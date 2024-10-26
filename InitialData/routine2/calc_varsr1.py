@@ -102,7 +102,7 @@ if args.v:
 # Calculate evenly spaced phi values
 df = pd.DataFrame(np.repeat(df.values, n_phi, axis=0), columns=df.columns)
 num_rows = len(df)
-phi_values = np.linspace(0, 2 * np.pi, num_rows % n_phi or n_phi)
+phi_values = np.linspace(np.float64(0), np.float64(2 * np.pi), num_rows % n_phi or n_phi, endpoint=False)
 df["phi"] = np.tile(phi_values, num_rows // n_phi + 1)[:num_rows]
 s4 = time.time()
 if args.v:
@@ -243,14 +243,10 @@ df["gyy"] = (
     * (df.y**2 / df.r**2 + df.z**2 * np.sin(df.phi) ** 2 / df.r**2)
     + np.cos(df.phi) ** 2 * df.psi**4
 )
-df["gyz"] = (
-    df.psi**4
-    * np.exp(2 * df.q)
-    * (
-        df.y * df.z / df.r**2
-        - df.z * np.sin(df.phi) * np.sqrt(df.x**2 + df.y**2) / df.r**2
-    )
-)
+
+df["gyz"] =  ((df.psi**4) * (np.exp(2 * df.q)) * (df.z/df.r**2) )* ((df.y) - (np.sin(df.phi) * np.sqrt(df.x**2 + df.y**2)))
+
+
 df["gzz"] = (
     df.psi**4 * np.exp(2 * df.q) * (df.x**2 + df.y**2) / df.r**2
     + df.psi**4 * np.exp(2 * df.q) * df.z**2 / df.r**2

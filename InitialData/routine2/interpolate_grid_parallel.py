@@ -25,6 +25,9 @@ output_dir = "processed_grids/"  ##end with /
 print("LOADING IN DATA")
 s1 = time.time()
 df = pd.read_hdf(args.data_folder + "3D_data/all_data_routine1.h5", key="df")
+
+df = df.map(lambda x: np.float64(0) if abs(x) < 1e-10 else x)
+
 print(f"loaded data in {time.time() - s1} sec")
 
 print("PREPROCESSING DATA")
@@ -36,6 +39,7 @@ idx_point_map = {
     (r, theta, phi): index
     for index, (r, theta, phi) in enumerate(zip(df["r"], df["theta"], df["phi"]))
 }
+
 print(f"processed data in {time.time() - s2} sec")
 
 
