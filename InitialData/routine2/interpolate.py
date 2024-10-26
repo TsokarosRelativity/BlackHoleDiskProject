@@ -6,7 +6,6 @@ import pandas as pd
 kerrm = 1
 kerra = 0.8
 r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
-
 def locate_point(r_arr, theta_arr, phi_arr, p):
     x, y, z = p
     r_0 = np.sqrt(x**2 + y**2 + z**2)
@@ -20,35 +19,35 @@ def locate_point(r_arr, theta_arr, phi_arr, p):
     theta_idx_2 = np.searchsorted(theta_arr, theta_0, side="right")
     phi_idx_1 = np.searchsorted(phi_arr, phi_0) - 1
     phi_idx_2 = np.searchsorted(phi_arr, phi_0, side="right")
-    
+
     theta_edge_case = False
     if theta_idx_1 == -1:
         theta_idx_1 = 1
         theta_edge_case = True
-    if theta_idx_2 == len(theta_arr) + 1:
+    if theta_idx_2 == len(theta_arr):
         theta_idx_2 = theta_idx_1
         theta_edge_case = True
     if phi_idx_1 == -1:
-        phi_idx_1 = len(phi_arr) - 2
-    if phi_idx_2 == len(phi_arr) + 1:
-        phi_idx_2 = 1
+        phi_idx_1 = len(phi_arr) - 1
+    if phi_idx_2 == len(phi_arr):
+        phi_idx_2 = 0
     # Handle edge cases
-
+    print("indexes for point: ", p)
+    print(r_idx_1, r_idx_2, theta_idx_1, theta_idx_2, phi_idx_1, phi_idx_2)
     # Get surrounding points
     rs = [r_arr[r_idx_1], r_arr[r_idx_2]]
     ts = [theta_arr[theta_idx_1], theta_arr[theta_idx_2]]
     ps = [phi_arr[phi_idx_1], phi_arr[phi_idx_2]]
     if theta_edge_case:
-        ps.append(phi_arr[-2] - ps[0]) 
-        ps.append(phi_arr[-2] - ps[1])
+        phi_idx_3 = (phi_idx_1 + len(phi_arr) // 2) % len(phi_arr)
+        phi_idx_4 = (phi_idx_2 + len(phi_arr) // 2) % len(phi_arr)
+        ps = [phi_arr[phi_idx_3], phi_arr[phi_idx_4]]
     # Generate all combinations
     combinations = np.array(np.meshgrid(rs, ts, ps)).T.reshape(-1, 3)
     z = combinations[:, 0] == np.float64(0)
     combinations[z] = np.array([np.float64(0), np.float64(0), np.float64(0)])
     combinations = np.unique(combinations, axis=0)
     return combinations
-
-
 def calc_weighted_average(points, scalar_vals, p):
     d = np.sum(np.abs((points - p)), axis=1)
     if np.any(d <= 1e-6):
