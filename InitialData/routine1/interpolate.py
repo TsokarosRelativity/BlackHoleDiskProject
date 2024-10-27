@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy.spatial import cKDTree
 from numba import njit
 
 
@@ -117,8 +118,6 @@ def locate_point(
 
 def calc_weighted_average(points, scalar_vals, p):
     d = np.sum(np.abs((points - p)) ** (1/2), axis=1)
-    if any(d <= 1e-3):
-        return scalar_vals[np.argmin(d)]
     weights = 1 / d
     weights = weights.reshape((-1, 1))
     return np.sum(weights * scalar_vals, axis=0) / np.sum(weights)

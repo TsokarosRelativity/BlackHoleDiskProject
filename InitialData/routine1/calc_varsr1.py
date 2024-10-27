@@ -499,9 +499,9 @@ if args.v:
 dfall.to_hdf(args.folder + "3D_data/r1_datadump.h5", key="df", mode="w")
 ret_df = dfall[
     [
-        "r",
-        "theta",
-        "phi",
+        "x",
+        "y",
+        "z",
         "alpha",
         "beta__x",
         "beta__y",
@@ -530,9 +530,9 @@ ret_df = dfall[
 ]
 
 origin = {
-    "r": [np.float64(0)],
-    "theta": [np.float64(0)],
-    "phi": [np.float64(0)],
+    "x": [np.float64(0)],
+    "y": [np.float64(0)],
+    "z": [np.float64(0)],
     "alpha": [np.float64(-1.0)],
     "beta__x": [np.float64(0)],
     "beta__y": [np.float64(0)],
