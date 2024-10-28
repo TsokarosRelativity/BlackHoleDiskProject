@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+from scipy.spatial import cKDTree
 
 #### BH Horizon Radius r_s = 0.5 * np.sqrt(kerrm**2 - kerra**2)
 kerrm = 1
@@ -55,25 +55,25 @@ def calc_weighted_average(points, scalar_vals, p):
     return np.sum(weights * scalar_vals, axis=0) / np.sum(weights)
 
 
-def spherical2cart(r, t, p):
-    x = r * np.sin(t) * np.cos(p)
-    y = r * np.sin(t) * np.sin(p)
-    z = r * np.cos(t)
-    return (x, y, z)
+#def spherical2cart(r, t, p):
+#    x = r * np.sin(t) * np.cos(p)
+#    y = r * np.sin(t) * np.sin(p)
+#    z = r * np.cos(t)
+#    return (x, y, z)
+#
 
-
-def interpolate_point(p, df, rad_arr, theta_arr, phi_arr, idx_point_map):
-    surroundingpoints = locate_point(rad_arr, theta_arr, phi_arr, p)  # numpy array
-    carpointdata = []
-    scalardata = []
-    for point in surroundingpoints:
-        tmpr, tmpt, tmpp = point
-        rowIndex = idx_point_map[(tmpr, tmpt, tmpp)]
-        rowdata = df.iloc[rowIndex]
-        tmpx, tmpy, tmpz = spherical2cart(tmpr, tmpt, tmpp)
-        carpointdata.append([tmpx, tmpy, tmpz])
-        scalardata.append(rowdata[3:])
-    carpointdata = np.array(carpointdata)
-    scalardata = np.array(scalardata)
-    interpolateddata = calc_weighted_average(carpointdata, scalardata, p)
-    return np.hstack((p, interpolateddata))
+#def interpolate_point(p, df, pdata, idx_point_map):
+#    surroundingpoints = locate_point(rad_arr, theta_arr, phi_arr, p)  # numpy array
+#    carpointdata = []
+#    scalardata = []
+#    for point in surroundingpoints:
+#        tmpr, tmpt, tmpp = point
+#        rowIndex = idx_point_map[(tmpr, tmpt, tmpp)]
+#        rowdata = df.iloc[rowIndex]
+#        tmpx, tmpy, tmpz = spherical2cart(tmpr, tmpt, tmpp)
+#        carpointdata.append([tmpx, tmpy, tmpz])
+#        scalardata.append(rowdata[3:])
+#    carpointdata = np.array(carpointdata)
+#    scalardata = np.array(scalardata)
+#    interpolateddata = calc_weighted_average(carpointdata, scalardata, p)
+#    return np.hstack((p, interpolateddata))

@@ -32,13 +32,20 @@ print(f"loaded data in {time.time() - s1} sec")
 
 print("PREPROCESSING DATA")
 s2 = time.time()
-rad_arr = np.sort(df.r.unique())
-theta_arr = np.sort(df.theta.unique())
-phi_arr = np.sort(df.phi.unique())
-idx_point_map = {
-    (r, theta, phi): index
-    for index, (r, theta, phi) in enumerate(zip(df["r"], df["theta"], df["phi"]))
-}
+
+#index_point_map = {
+#    (x, y, z): index
+#    for index, (x, y, z) in enumerate(zip(df["x"], df["y"], df["z"]))
+#}
+
+pointdata = df[["x", "y", "z"]].values
+#rad_arr = np.sort(df.r.unique())
+#theta_arr = np.sort(df.theta.unique())
+#phi_arr = np.sort(df.phi.unique())
+#idx_point_map = {
+#    (r, theta, phi): index
+#    for index, (r, theta, phi) in enumerate(zip(df["r"], df["theta"], df["phi"]))
+#}
 
 print(f"processed data in {time.time() - s2} sec")
 
@@ -55,7 +62,7 @@ def interpolate_grid(new_grid, df):
             for x in x_arr:
                 p = np.array([x, y, z])
                 new_line = interpolate_point(
-                    p, df, rad_arr, theta_arr, phi_arr, idx_point_map
+                    p, df, pointdata, idx_point_map
                 )
                 data.append(new_line)
     return np.array(data)
