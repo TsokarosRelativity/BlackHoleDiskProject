@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.interpolate import RegularGridInterpolator
 from scipy.spatial import KDTree
 import argparse
 import time
@@ -25,9 +26,13 @@ output_dir = "grid_data/"
 gridfile = "grids_bh_disk_patrik"
 print("LOADING IN DATA... processing")
 df = pd.read_hdf(args.data_folder + "3D_data/all_data.h5", key="df")
-df = df.mask(abs(df) < 1e-14, np.float64(0))
-df = df.drop_duplicates(subset=["x", "y", "z"], keep="last")
-treemap = KDTree(df[["x", "y", "z"]].to_numpy())
+df = df.map(lambda x: np.float64(0) if abs(x) < np.float64(1e-9) else x)
+df = df.sort_values(by=["x", "y", "z"])
+df = df.drop_duplicates(subset=["x", "y", "z"], keep="first")
+df_data = df.to_numpy()
+interp = RegularGridInterpolator(df_data[:, :3], df_data[:, 3:], method="cubic")
+
+#treemap = KDTree(df[["x", "y", "z"]].values)
 print("FINISHED PREPROCESSING DATA :)")
 
 cols = list(df.columns)
@@ -46,11 +51,13 @@ def gridmaker(new_grid, outputfile, df, kval):
         y_arr = np.arange(y_min, y_min + dy * Ny, dy)
         z_arr = np.arange(z_min, z_min + dz * Nz, dz)
         grid = np.array(np.meshgrid(x_arr, y_arr, z_arr)).T.reshape(-1, 3)
-        inds = [locatingpoints(p, treemap) for p in grid]
-        interpolated_data = np.array([
-            interpolate_grid(p, i, df)
-            for p, i in zip(grid, inds)
-            ])
+
+#        dMat, iMat = treemap.query(grid, k=kval, workers=-1)
+#        interpolated_data = np.array([
+#                interpolate_grid(p, d, i, df) 
+#                for p, d, i in zip(grid, dMat, iMat)
+#                ])
+
         ntot = Nx * Ny * Nz
         with open(args.data_folder + output_dir + outputfile, "wb") as f:
             f.write(np.array([Nx, Ny, Nz, ntot], dtype=np.float64).tobytes())
@@ -61,23 +68,15 @@ def gridmaker(new_grid, outputfile, df, kval):
         print(f"time elapse: {time.time() - ts} sec")
     return 
 
-def locatingpoints(p, tree):
-    ir = 1e-5
-    dcheck, icheck = tree.query(p, workers=-1)
-    if dcheck == np.float64(0):
-        return np.array([icheck])
-    while True:
-        inds = tree.query_ball_point(p, ir)
-        if len(inds) < 8:
-            ir += 1e-5
-        else:
-            break
-    return inds
-def interpolate_grid(p, ind, df):
-    if len(ind) == 1:
-        return df.iloc[ind].to_numpy()
-    data = df.iloc[ind]
-    r = np.sum(data[:, 3:], axis=0) / len(ind)
+
+
+def interpolate_grid(p, dist, ind, df):
+    if np.any(dist == 0):
+        t = df.iloc[ind[np.argmin(dist)]]
+        return np.hstack([p, t.values[3:]])
+    w = 1/dist
+    w = w.reshape((-1, 1))
+    r = np.sum(w * df.iloc[ind].values[:, 3:], axis=0) / np.sum(w)
     return np.hstack([p, r])
 
 linedata = []
@@ -92,6 +91,15 @@ with concurrent.futures.ThreadPoolExecutor() as executor:
         futures.append(future)
     
     concurrent.futures.wait(futures)
+#    with concurrent.futures.ThreadPoolExecutor() as executor:
+#        # Submit all tasks to the executor
+#        futures = [executor.submit(gridmaker, ld[0], ld[1], df, 8) for ld in linedata ]
+#        
+#        # Wait for all tasks to complete
+#        concurrent.futures.wait(futures)
+
+
+
 print(f"Finished all grids in {time.time() - s1} sec")
 
 
