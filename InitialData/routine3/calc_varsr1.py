@@ -293,8 +293,7 @@ df.loc[cond1, "Kyz"] = (
     * (-df.Hf * np.sqrt(df.x**2 + df.y**2) + df.He * df.z * np.sin(df.theta))
     / (df.psi**2 * df.r**4)
 )
-df.loc[cond1, "Kzz"] = np.zeros(cond1.sum(), dtype=np.float64)
-
+df["Kzz"] = np.float64(0.0)
 # For the positive z region
 df.loc[~cond1 , "Kxx"] = -(
     (2 * df.alpha * df.He + df.dbetatdr * df.psi**6 * df.r**4)
@@ -354,7 +353,6 @@ df.loc[~cond1 , "Kyz"] = -(
     )
 ) / (2 * df.alpha * df.psi**2 * df.r**4)
 
-df.loc[~cond1 , "Kzz"] = np.zeros((~cond1 & cond2).sum(), dtype=np.float64)
 
 s8 = time.time()
 if args.v:
@@ -452,7 +450,7 @@ if args.v:
 
 # ret_df.to_hdf(args.folder + "3D_data/3d_datadump_routine1.h5", key="df", mode="w")
 
-dfall.to_hdf(args.folder + "3D_data/r1_datadump.h5", key="df", mode="w")
+#dfall.to_hdf(args.folder + "3D_data/r1_datadump.h5", key="df", mode="w")
 ret_df = dfall[
     [
         "x",
