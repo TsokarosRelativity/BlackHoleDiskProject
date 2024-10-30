@@ -77,7 +77,6 @@ def interpolate_grid(p, ind, df):
     data = df.iloc[ind].to_numpy()
     dis = np.linalg.norm(data[:, :3] - p, ord=2, axis=1)
     wet = 1/dis
-    wet = wet.reshape((-1, 1))
     r = np.sum(wet*data[:, 3:], axis=0) / np.sum(wet) 
     return np.hstack([p, r])
 
@@ -87,8 +86,10 @@ with open(gridfile, "r") as f:
     linedata = [process_line(l) for l in lines]
     print("LINE DATA LOADED AHHHHHHHHHHHHHHHH")
 
+for l in linedata:
+    gridmaker(l[0], l[1], df)
+#r = Parallel(n_jobs=-1)(delayed(gridmaker)(l[0], l[1], df) for l in linedata)
 
-r = Parallel(n_jobs=-1)(delayed(gridmaker)(l[0], l[1], df) for l in linedata)
 #
 #with open(gridfile, "r") as f:
 #    lines = f.readlines()
