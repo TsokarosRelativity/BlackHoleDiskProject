@@ -144,7 +144,7 @@ def interpolationpoint(radarr, thetaarr, phiarr, point, tree, df):
         data = df.iloc[id].sort_values(by=["r", "theta", "phi"]).drop_duplicates().to_numpy()
         
         
-        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="cubic")
+        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="thin_plate_spline")
         vals = interp(np.array([[rp, thetap, phip]]).reshape(1, -1))
         return vals
         
@@ -176,7 +176,7 @@ def interpolationpoint(radarr, thetaarr, phiarr, point, tree, df):
         data = df.iloc[id].sort_values(by=["r", "theta", "phi"]).drop_duplicates().to_numpy()
         
         
-        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="cubic")
+        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="thin_plate_spline")
         vals = interp(np.array([[rp, thetap, phip]]).reshape(1, -1))
         return vals
         
@@ -208,7 +208,7 @@ def interpolationpoint(radarr, thetaarr, phiarr, point, tree, df):
         data = df.iloc[id].sort_values(by=["r", "theta", "phi"]).drop_duplicates().to_numpy()
         
         
-        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="cubic")
+        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="thin_plate_spline")
         vals = interp(np.array([[rp, thetap, phip]]).reshape(1, -1))
         return vals
         
@@ -253,7 +253,7 @@ def interpolationpoint(radarr, thetaarr, phiarr, point, tree, df):
         data = df.iloc[id].sort_values(by=["r", "theta", "phi"]).drop_duplicates().to_numpy()
        
         
-        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="cubic")
+        interp = RBFInterpolator(data[:, :3], data[:, 3:], kernel="thin_plate_spline")
         vals = interp(np.array([[rp, thetap, phip]]).reshape(1, -1))
         return vals
 
