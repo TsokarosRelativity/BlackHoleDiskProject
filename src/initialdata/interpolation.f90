@@ -19,12 +19,34 @@ module interpolation_module
 
 contains
 
+  
   subroutine load_data()
+    character(len=100) :: filename
+    integer :: io_status, ind, rows
     ! Implement data loading here
     print *, "Loading in data..."
-    ! TODO: Implement HDF5 reading for df_3d
-    ! TODO: Implement sorting and unique operations on df_3d
-    ! TODO: Initialize rad_arr, theta_arr, phi_arr
+    filename = "df3d.txt"
+    open(unit=8, file=filename, status='old', action='read', iostat=io_status)
+    if (io_status /= 0) then
+      print *, "Error opening file: ", filename
+      exit
+    endif 
+    
+    rows = 64600901 !matrix dimensions -> (64600901, 27) 
+    allocate(data_3d(rows, 27), stat=io_status)
+    if (io_status /= 0) then 
+      print *, "Error allocating data"
+      exit
+    end if
+    
+    do ind = 1, row
+      read(8, '(27ES16.6)', stat=io_status) data_3d(ind, :)
+      if (io_status /= 0) then
+        print *, "Error reading data on line " , ind
+        exit
+      end if
+    end do
+
     print *, "Data loaded successfully!"
   end subroutine load_data
 
@@ -226,19 +248,12 @@ contains
         call cartesian_to_spherical(grids(i)%gridcoords, grids(i)%sphericalgrid, ntot) 
     end do
     
-!    ! Clean up
-!    do i = 1, 5
-!        if (allocated(grids(i)%gridcoords)) then
-!            deallocate(grids(i)%gridcoords)
-!        end if
-!    end do
     
     close(9)
 
     ! -> checked with processline.f90 
   end subroutine process_line 
 
-! -> need to check
   subroutine cartesian_to_spherical(cart_coords, sph_coords, n_points)
       implicit none
       ! Input/output variables
