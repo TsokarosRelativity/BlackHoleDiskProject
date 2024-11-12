@@ -1,16 +1,20 @@
 module interpolation_module
-  use iso_fortran_env, only: real64, int32
+  use iso_fortran_env, only: real64, int64
+  use m_KdTree
   implicit none
 
   ! Global variables
   real(real64), allocatable :: rad_arr(:), theta_arr(:), phi_arr(:)
   real(real64), allocatable :: data_3d(:,:)
-
+  type(KdTree) :: tree_grid
+  type(KdTree) :: tree_rad
+  type(KdTree) :: tree_theta
+  type(KdTree) :: tree_phi
   type :: gridparams 
      real(real64) :: xmin, ymin, zmin, dz, dy, dx
-     integer(int64) :: nz, ny, nx, MPI_ID
+     integer(int64) :: nz, ny, nx
      character(len=40) :: outputfile
-     real(real64), allocatable :: grid(:,:)
+     real(real64), allocatable :: gridcoords(:,:), sphericalgrid(:,:)
   end type gridparams 
 
 contains
@@ -24,16 +28,24 @@ contains
     print *, "Data loaded successfully!"
   end subroutine load_data
 
-  subroutine create_kdtree()
+  subroutine create_kdtree(kdtg, kdtr, kdtt, kdtp)
+    type(KdTree), intent(out) :: kdtg
+    type(KdTree), intent(out) :: kdtr
+    type(KdTree), intent(out) :: kdtt
+    type(KdTree), intent(out) :: kdtp
     print *, "Creating KD-tree..."
-    ! TODO: Implement KD-tree creation
+    kdtg = KdTree(rad_arr, theta_arr, phi_arr)
+    kdtr = KdTree(rad_arr)
+    kdtt = KdTree(theta_arr)
+    kdtp = KdTree(phi_arr)
     print *, "KD-tree created successfully!"
-  end subroutine create_kdtree
+  end subroutine create_kdtree_grid
 
-  function get_nearest_point_index(r, theta, phi) result(index)
+  function get_nearest_point_index(tree, r, theta, phi) result(ind)
     real(real64), intent(in) :: r, theta, phi
-    integer :: index
-    ! TODO: Implement KD-tree query
+    type(KdTree), intent(in) :: tree
+    integer :: ind
+    ind = search%nearest(tree, rad_arr, theta_arr, phi_arr, r, theta, phi) 
   end function get_nearest_point_index
 
   function interpolationpoint(point) result(vals)
@@ -79,78 +91,192 @@ contains
   end function interpolationpoint
 
   subroutine process_line(line, grids)
+    integer(int64) :: i, j, k, l, io_status, n_parts, ntot, ind
     character(len=250), intent(in) :: line
+    character(len=250) :: filename, errmsg, tmp, prefix
+    character(len=250), dimension(11) :: parts
+    real(real64) :: xmax, ymax, zmax
+    
     type(gridparams), dimension(1280), intent(out) :: grids
-    character(len=100) :: tmp, prefix, filename
-    character(len=50), dimension(11) :: parts
-    integer ::, i, j, n_parts, ios
-
-    prefix = "CTs_bin-proc"
-    filename = "grids_bh_disk_patrick"
-
+    
+    filename = "grids_bh_disk_patrik"
+    prefix = "CTS_bin-proc"
+    
     open(unit=9, file=filename, status='old', action='read', iostat=io_status)
     if (io_status /= 0) then
-      print *, "Error opening file: ", filename
-      stop
+        print *, "Error opening file: ", filename
+        stop
     end if
     
     do i = 1, 1280 
-      read(9, '(A)', iostat=io_status) line
-      if (io_status /= 0) then
-        print *, "error reading data"
-      end if 
-      print *, "line ", i, "data: "
-      print *, line
-      print *, "line length:"
-      print *, len(trim(line))
-      print *, line(1:len(trim(line)))
-      tmp = ""
-      n_parts = 1
-      parts = ""
-      do j = 1, len(trim(line))
-        !print *, line(j:j)
-        if (line(j:j) == ' ') then
-          if (len(trim(tmp)) > 0) then
-            !print *, "tmp: ", trim(tmp)
-            parts(n_parts) = tmp
-            n_parts = n_parts + 1
-            tmp = ""
-          end if
-        else
-          tmp = trim(tmp) // line(j:j)
-          !print *, trim(tmp)
+        read(9, '(A)', iostat=io_status) line
+        if (io_status /= 0) then
+            print *, "error reading data on line ", i
+            exit
+        end if 
+        
+        ! Split the line into parts
+        tmp = ""
+        n_parts = 1
+        parts = ""
+        do j = 1, len(trim(line))
+            if (line(j:j) == ' ') then
+                if (len(trim(tmp)) > 0) then
+                    parts(n_parts) = tmp
+                    n_parts = n_parts + 1
+                    tmp = ""
+                end if
+            else
+                tmp = trim(tmp) // line(j:j)
+            end if
+        end do
+        parts(n_parts) = trim(tmp)
+        
+        ! Read the values with error checking
+        read(parts(2), *, iostat=io_status) grids(i)%xmin
+        if (io_status /= 0) then
+            print *, "Error reading xmin on line ", i
+            exit
         end if
-      end do
-      parts(n_parts) = trim(tmp)
-      grids(i)%xmin = real(parts(2), real64)
-      grids(i)%ymin = real(parts(3), real64)
-      grids(i)%zmin = real(parts(4), real64)
-      grids(i)%dx = real(parts(5), real64)
-      grids(i)%dy = real(parts(6), real64)
-      grids(i)%dz = real(parts(7), real64)
-      grids(i)%nx = int(parts(8), int64)
-      grids(i)%ny = int(parts(9), int64)
-      grids(i)%nz = int(parts(10), int64)
-      grids(i)%outputfile = prefix // trim(parts(11)) // ".d"
-      
+        read(parts(3), *, iostat=io_status) grids(i)%ymin
+
+        if (io_status /= 0) then
+            print *, "Error reading ymin on line", i
+            exit
+        end if
+        read(parts(4), *, iostat=io_status) grids(i)%zmin
+        
+        if (io_status /= 0) then
+            print *, "Error reading zmin on line", i
+            exit
+        end if
+        read(parts(5), *, iostat=io_status) grids(i)%dx
+        
+        if (io_status /= 0) then
+            print *, "Error reading dx on line", i
+            exit
+        end if
+        read(parts(6), *, iostat=io_status) grids(i)%dy
+        
+        if (io_status /= 0) then
+            print *, "Error reading dy on line", i
+            exit
+        end if
+        read(parts(7), *, iostat=io_status) grids(i)%dz
+        
+        if (io_status /= 0) then
+            print *, "Error reading dz on line", i
+            exit
+        end if
+        read(parts(8), *, iostat=io_status) grids(i)%nx
+        
+        if (io_status /= 0) then
+            print *, "Error reading nx on line", i
+            exit
+        end if
+        read(parts(9), *, iostat=io_status) grids(i)%ny
+        
+        if (io_status /= 0) then
+            print *, "Error reading ny on line", i
+            exit
+        end if
+        read(parts(10), *, iostat=io_status) grids(i)%nz
+        
+        if (io_status /= 0) then
+            print *, "Error reading nz on line", i
+            exit
+        end if
+        grids(i)%outputfile = prefix // trim(parts(11)) // ".d"
+        
+        ! Calculate total size needed
+        ntot = grids(i)%nx * grids(i)%ny * grids(i)%nz
+        
+        ! Allocate with size checking
+        if (ntot <= 0) then
+            print *, "Invalid grid dimensions:", grids(i)%nx, grids(i)%ny, grids(i)%nz
+            exit
+        end if
+        
+        allocate(grids(i)%gridcoords(ind, 3), stat=io_status)
+        allocate(grids(i)%gridcoords(ind, 3), stat=io_status)
+        if (io_status /= 0) then
+            print *, "Error allocating grid"
+            exit
+        end if
+        
+        print *, "Grid allocated successfully with size:", ntot 
+        
+        ! Fill the grid using integer indices instead of real-valued loops
+        ind = 1
+        do k = 0, grids(i)%nz - 1
+            do j = 0, grids(i)%ny - 1
+                do l = 0, grids(i)%nx - 1
+                    if (ind > size(grids(i)%gridcoords, 1)) then
+                        print *, "Index out of bounds:", ind
+                        exit
+                    end if
+                    
+                    grids(i)%gridcoords(ind, 1) = grids(i)%xmin + l * grids(i)%dx
+                    grids(i)%gridcoords(ind, 2) = grids(i)%ymin + j * grids(i)%dy
+                    grids(i)%gridcoords(ind, 3) = grids(i)%zmin + k * grids(i)%dz
+                    ind = ind + 1
+                end do
+            end do
+        end do
+        call cartesian_to_spherical(grids(i)%gridcoords, grids(i)%sphericalgrid, ntot) 
     end do
+    
+!    ! Clean up
+!    do i = 1, 5
+!        if (allocated(grids(i)%gridcoords)) then
+!            deallocate(grids(i)%gridcoords)
+!        end if
+!    end do
+    
     close(9)
 
     ! -> checked with processline.f90 
-  end subroutine process_line
+  end subroutine process_line 
 
-  subroutine gridmaker(gridparams, gridcoords, nx, ny, nz)
-    real(real64), intent(in) :: gridparams(10)
-    real(real64), allocatable, intent(out) :: gridcoords(:,:)
-    integer, intent(out) :: nx, ny, nz
-    ! TODO: Implement grid creation
-  end subroutine gridmaker
-
-  subroutine cartesiantospherical(cart, spher)
-    real(real64), intent(in) :: cart(:,:)
-    real(real64), allocatable, intent(out) :: spher(:,:)
-    ! TODO: Implement coordinate transformation
-  end subroutine cartesiantospherical
+! -> need to check
+  subroutine cartesian_to_spherical(cart_coords, sph_coords, n_points)
+      implicit none
+      ! Input/output variables
+      integer, intent(in) :: n_points
+      real(real64), intent(in) :: cart_coords(n_points, 3)  ! Changed from real(int64)
+      real(real64), intent(out) :: sph_coords(n_points, 3)  ! Changed from real(int64)
+      
+      ! Local variables
+      integer :: i
+      real(real64) :: x, y, z, r  ! Changed from real(int64)
+      real(real64), parameter :: eps = 1.0d-14  ! Changed from real(int64)
+      
+      do i = 1, n_points
+          x = cart_coords(i, 1)
+          y = cart_coords(i, 2)
+          z = cart_coords(i, 3)
+          
+          ! Calculate radius (r)
+          r = sqrt(x**2 + y**2 + z**2)
+          sph_coords(i, 1) = r
+          
+          ! Calculate theta (polar angle)
+          if (r /= 0.0d0) then
+              ! Clip z/r to [-1,1] range to avoid numerical issues
+              sph_coords(i, 2) = acos(max(min(z/r, 1.0d0), -1.0d0))
+          else
+              sph_coords(i, 2) = 0.0d0
+          end if
+          
+          ! Calculate phi (azimuthal angle)
+          sph_coords(i, 3) = atan2(y, x)
+          
+          ! Zero out very small values (less than eps)
+          if (abs(sph_coords(i, 1)) < eps) sph_coords(i, 1) = 0.0d0
+          if (abs(sph_coords(i, 2)) < eps) sph_coords(i, 2) = 0.0d0
+          if (abs(sph_coords(i, 3)) < eps) sph_coords(i, 3) = 0.0d0
+      end do
+  end subroutine cartesian_to_spherical
 
   subroutine routine(line)
     character(len=*), intent(in) :: line
@@ -160,7 +286,6 @@ contains
     integer :: nx, ny, nz, ntot, i
     
     call process_line(line, gridparams, output_file)
-    call gridmaker(gridparams, cartgrid, nx, ny, nz)
     call cartesiantospherical(cartgrid, sphercalgrid)
     
     allocate(interpolated_data(size(cartgrid, 1), 24))
