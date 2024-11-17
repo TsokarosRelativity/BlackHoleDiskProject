@@ -12,7 +12,7 @@ subroutine daxpy ( n, da, dx, incx, dy, incy )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license. 
+!    This code is distributed under the GNU LGPL license. 
 !
 !  Modified:
 !
@@ -40,35 +40,33 @@ subroutine daxpy ( n, da, dx, incx, dy, incy )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of elements in DX and DY.
+!    Input, integer ( kind = 4 ) N, the number of elements in DX and DY.
 !
-!    Input, real ( kind = rk ) DA, the multiplier of DX.
+!    Input, real ( kind = 8 ) DA, the multiplier of DX.
 !
-!    Input, real ( kind = rk ) DX(*), the first vector.
+!    Input, real ( kind = 8 ) DX(*), the first vector.
 !
-!    Input, integer INCX, the increment between successive 
+!    Input, integer ( kind = 4 ) INCX, the increment between successive 
 !    entries of DX.
 !
-!    Input/output, real ( kind = rk ) DY(*), the second vector.
+!    Input/output, real ( kind = 8 ) DY(*), the second vector.
 !    On output, DY(*) has been replaced by DY(*) + DA * DX(*).
 !
-!    Input, integer INCY, the increment between successive 
+!    Input, integer ( kind = 4 ) INCY, the increment between successive 
 !    entries of DY.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
-
-  real ( kind = rk ) da
-  real ( kind = rk ) dx(*)
-  real ( kind = rk ) dy(*)
-  integer i
-  integer incx
-  integer incy
-  integer ix
-  integer iy
-  integer m
-  integer n
+  real ( kind = 8 ) da
+  real ( kind = 8 ) dx(*)
+  real ( kind = 8 ) dy(*)
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) incx
+  integer ( kind = 4 ) incy
+  integer ( kind = 4 ) ix
+  integer ( kind = 4 ) iy
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) n
 
   if ( n <= 0 ) then
     return
@@ -134,7 +132,7 @@ function ddot ( n, dx, incx, dy, incy )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license. 
+!    This code is distributed under the GNU LGPL license. 
 !
 !  Modified:
 !
@@ -162,36 +160,34 @@ function ddot ( n, dx, incx, dy, incy )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of entries in the vectors.
+!    Input, integer ( kind = 4 ) N, the number of entries in the vectors.
 !
-!    Input, real ( kind = rk ) DX(*), the first vector.
+!    Input, real ( kind = 8 ) DX(*), the first vector.
 !
-!    Input, integer INCX, the increment between successive 
+!    Input, integer ( kind = 4 ) INCX, the increment between successive 
 !    entries in DX.
 !
-!    Input, real ( kind = rk ) DY(*), the second vector.
+!    Input, real ( kind = 8 ) DY(*), the second vector.
 !
-!    Input, integer INCY, the increment between successive 
+!    Input, integer ( kind = 4 ) INCY, the increment between successive 
 !    entries in DY.
 !
-!    Output, real ( kind = rk ) DDOT, the sum of the product of the 
+!    Output, real ( kind = 8 ) DDOT, the sum of the product of the 
 !    corresponding entries of DX and DY.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
-
-  real ( kind = rk ) ddot
-  real ( kind = rk ) dtemp
-  real ( kind = rk ) dx(*)
-  real ( kind = rk ) dy(*)
-  integer i
-  integer incx
-  integer incy
-  integer ix
-  integer iy
-  integer m
-  integer n
+  real ( kind = 8 ) ddot
+  real ( kind = 8 ) dtemp
+  real ( kind = 8 ) dx(*)
+  real ( kind = 8 ) dy(*)
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) incx
+  integer ( kind = 4 ) incy
+  integer ( kind = 4 ) ix
+  integer ( kind = 4 ) iy
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) n
 
   ddot = 0.0D+00
   dtemp = 0.0D+00
@@ -262,7 +258,7 @@ function dnrm2 ( n, x, incx )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license. 
+!    This code is distributed under the GNU LGPL license. 
 !
 !  Modified:
 !
@@ -290,28 +286,26 @@ function dnrm2 ( n, x, incx )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of entries in the vector.
+!    Input, integer ( kind = 4 ) N, the number of entries in the vector.
 !
-!    Input, real ( kind = rk ) X(*), the vector whose norm is to be computed.
+!    Input, real ( kind = 8 ) X(*), the vector whose norm is to be computed.
 !
-!    Input, integer INCX, the increment between successive 
+!    Input, integer ( kind = 4 ) INCX, the increment between successive 
 !    entries of X.
 !
-!    Output, real ( kind = rk ) DNRM2, the Euclidean norm of X.
+!    Output, real ( kind = 8 ) DNRM2, the Euclidean norm of X.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
-
-  real ( kind = rk ) absxi
-  real ( kind = rk ) dnrm2
-  integer incx
-  integer ix
-  integer n
-  real ( kind = rk ) norm
-  real ( kind = rk ) scale
-  real ( kind = rk ) ssq
-  real ( kind = rk ) x(*)
+  real ( kind = 8 ) absxi
+  real ( kind = 8 ) dnrm2
+  integer ( kind = 4 ) incx
+  integer ( kind = 4 ) ix
+  integer ( kind = 4 ) n
+  real ( kind = 8 ) norm
+  real ( kind = 8 ) scale
+  real ( kind = 8 ) ssq
+  real ( kind = 8 ) x(*)
 
   if ( n < 1 .or. incx < 1 ) then
 
@@ -356,7 +350,7 @@ subroutine drot ( n, x, incx, y, incy, c, s )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license. 
+!    This code is distributed under the GNU LGPL license. 
 !
 !  Modified:
 !
@@ -384,36 +378,34 @@ subroutine drot ( n, x, incx, y, incy, c, s )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of entries in the vectors.
+!    Input, integer ( kind = 4 ) N, the number of entries in the vectors.
 !
-!    Input/output, real ( kind = rk ) X(*), one of the vectors to be rotated.
+!    Input/output, real ( kind = 8 ) X(*), one of the vectors to be rotated.
 !
-!    Input, integer INCX, the increment between successive 
+!    Input, integer ( kind = 4 ) INCX, the increment between successive 
 !    entries of X.
 !
-!    Input/output, real ( kind = rk ) Y(*), one of the vectors to be rotated.
+!    Input/output, real ( kind = 8 ) Y(*), one of the vectors to be rotated.
 !
-!    Input, integer INCY, the increment between successive
+!    Input, integer ( kind = 4 ) INCY, the increment between successive
 !    elements of Y.
 !
-!    Input, real ( kind = rk ) C, S, parameters (presumably the cosine and
+!    Input, real ( kind = 8 ) C, S, parameters (presumably the cosine and
 !    sine of some angle) that define a plane rotation.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
-
-  real ( kind = rk ) c
-  integer i
-  integer incx
-  integer incy
-  integer ix
-  integer iy
-  integer n
-  real ( kind = rk ) s
-  real ( kind = rk ) stemp
-  real ( kind = rk ) x(*)
-  real ( kind = rk ) y(*)
+  real ( kind = 8 ) c
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) incx
+  integer ( kind = 4 ) incy
+  integer ( kind = 4 ) ix
+  integer ( kind = 4 ) iy
+  integer ( kind = 4 ) n
+  real ( kind = 8 ) s
+  real ( kind = 8 ) stemp
+  real ( kind = 8 ) x(*)
+  real ( kind = 8 ) y(*)
 
   if ( n <= 0 ) then
 
@@ -493,7 +485,7 @@ subroutine drotg ( sa, sb, c, s )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license. 
+!    This code is distributed under the GNU LGPL license. 
 !
 !  Modified:
 !
@@ -521,25 +513,23 @@ subroutine drotg ( sa, sb, c, s )
 !
 !  Parameters:
 !
-!    Input/output, real ( kind = rk ) SA, SB.  On input, SA and SB are the values
+!    Input/output, real ( kind = 8 ) SA, SB.  On input, SA and SB are the values
 !    A and B.  On output, SA is overwritten with R, and SB is
 !    overwritten with Z.
 !
-!    Output, real ( kind = rk ) C, S, the cosine and sine of the
+!    Output, real ( kind = 8 ) C, S, the cosine and sine of the
 !    Givens rotation.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
-
-  real ( kind = rk ) c
-  real ( kind = rk ) r
-  real ( kind = rk ) roe
-  real ( kind = rk ) s
-  real ( kind = rk ) sa
-  real ( kind = rk ) sb
-  real ( kind = rk ) scale
-  real ( kind = rk ) z
+  real ( kind = 8 ) c
+  real ( kind = 8 ) r
+  real ( kind = 8 ) roe
+  real ( kind = 8 ) s
+  real ( kind = 8 ) sa
+  real ( kind = 8 ) sb
+  real ( kind = 8 ) scale
+  real ( kind = 8 ) z
 
   if ( abs ( sb ) < abs ( sa ) ) then
     roe = sa
@@ -583,7 +573,7 @@ subroutine dscal ( n, sa, x, incx )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license. 
+!    This code is distributed under the GNU LGPL license. 
 !
 !  Modified:
 !
@@ -611,26 +601,24 @@ subroutine dscal ( n, sa, x, incx )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of entries in the vector.
+!    Input, integer ( kind = 4 ) N, the number of entries in the vector.
 !
-!    Input, real ( kind = rk ) SA, the multiplier.
+!    Input, real ( kind = 8 ) SA, the multiplier.
 !
-!    Input/output, real ( kind = rk ) X(*), the vector to be scaled.
+!    Input/output, real ( kind = 8 ) X(*), the vector to be scaled.
 !
-!    Input, integer INCX, the increment between successive 
+!    Input, integer ( kind = 4 ) INCX, the increment between successive 
 !    entries of X.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
-
-  integer i
-  integer incx
-  integer ix
-  integer m
-  integer n
-  real ( kind = rk ) sa
-  real ( kind = rk ) x(*)
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) incx
+  integer ( kind = 4 ) ix
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) n
+  real ( kind = 8 ) sa
+  real ( kind = 8 ) x(*)
 
   if ( n <= 0 ) then
 
@@ -684,7 +672,7 @@ subroutine dsvdc ( a, lda, m, n, s, e, u, ldu, v, ldv, work, job, info )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -706,43 +694,43 @@ subroutine dsvdc ( a, lda, m, n, s, e, u, ldu, v, ldv, work, job, info )
 !
 !  Parameters:
 !
-!    Input/output, real ( kind = rk ) A(LDA,N).  On input, the M by N
+!    Input/output, real ( kind = 8 ) A(LDA,N).  On input, the M by N
 !    matrix whose singular value decomposition is to be computed.
 !    On output, the matrix has been destroyed.  Depending on the user's
 !    requests, the matrix may contain other useful information.
 !
-!    Input, integer LDA, the leading dimension of the array A.
+!    Input, integer ( kind = 4 ) LDA, the leading dimension of the array A.
 !    LDA must be at least N.
 !
-!    Input, integer M, the number of rows of the matrix.
+!    Input, integer ( kind = 4 ) M, the number of rows of the matrix.
 !
-!    Input, integer N, the number of columns of the matrix A.
+!    Input, integer ( kind = 4 ) N, the number of columns of the matrix A.
 !
-!    Output, real ( kind = rk ) S(MM), where MM = max(M+1,N).  The first
+!    Output, real ( kind = 8 ) S(MM), where MM = max(M+1,N).  The first
 !    min(M,N) entries of S contain the singular values of A arranged in
 !    descending order of magnitude.
 !
-!    Output, real ( kind = rk ) E(MM), where MM = max(M+1,N).  Ordinarily
+!    Output, real ( kind = 8 ) E(MM), where MM = max(M+1,N).  Ordinarily
 !    contains zeros.  However see the discussion of INFO for exceptions.
 !
-!    Output, real ( kind = rk ) U(LDU,K).  If JOBA = 1 then K = M;
+!    Output, real ( kind = 8 ) U(LDU,K).  If JOBA = 1 then K = M;
 !    if 2 <= JOBA, then K = min(M,N).  U contains the M by M matrix of
 !    left singular vectors.  U is not referenced if JOBA = 0.  If M <= N
 !    or if JOBA = 2, then U may be identified with A in the subroutine call.
 !
-!    Input, integer LDU, the leading dimension of the array U.
+!    Input, integer ( kind = 4 ) LDU, the leading dimension of the array U.
 !    LDU must be at least M.
 !
-!    Output, real ( kind = rk ) V(LDV,N), the N by N matrix of right singular
+!    Output, real ( kind = 8 ) V(LDV,N), the N by N matrix of right singular
 !    vectors.  V is not referenced if JOB is 0.  If N <= M, then V may be
 !    identified with A in the subroutine call.
 !
-!    Input, integer LDV, the leading dimension of the array V.
+!    Input, integer ( kind = 4 ) LDV, the leading dimension of the array V.
 !    LDV must be at least N.
 !
-!    Workspace, real ( kind = rk ) WORK(M).
+!    Workspace, real ( kind = 8 ) WORK(M).
 !
-!    Input, integer JOB, controls the computation of the singular
+!    Input, integer ( kind = 4 ) JOB, controls the computation of the singular
 !    vectors.  It has the decimal expansion AB with the following meaning:
 !      A =  0, do not compute the left singular vectors.
 !      A =  1, return the M left singular vectors in U.
@@ -750,7 +738,7 @@ subroutine dsvdc ( a, lda, m, n, s, e, u, ldu, v, ldv, work, job, info )
 !      B =  0, do not compute the right singular vectors.
 !      B =  1, return the right singular vectors in V.
 !
-!    Output, integer INFO, status indicator.
+!    Output, integer ( kind = 4 ) INFO, status indicator.
 !    The singular values (and their corresponding singular vectors)
 !    S(INFO+1), S(INFO+2),...,S(MN) are correct.  Here MN = min ( M, N ).
 !    Thus if INFO is 0, all the singular values and their vectors are
@@ -760,63 +748,61 @@ subroutine dsvdc ( a, lda, m, n, s, e, u, ldu, v, ldv, work, job, info )
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) lda
+  integer ( kind = 4 ) ldu
+  integer ( kind = 4 ) ldv
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) n
 
-  integer lda
-  integer ldu
-  integer ldv
-  integer m
-  integer n
-
-  real ( kind = rk ) a(lda,n)
-  real ( kind = rk ) b
-  real ( kind = rk ) c
-  real ( kind = rk ) cs
-  real ( kind = rk ) e(*)
-  real ( kind = rk ) el
-  real ( kind = rk ) emm1
-  real ( kind = rk ) f
-  real ( kind = rk ) g
-  integer info
-  integer iter
-  integer j
-  integer job
-  integer jobu
-  integer k
-  integer kase
-  integer kk
-  integer l
-  integer ll
-  integer lls
-  integer ls
-  integer lu
-  integer, parameter :: maxit = 30
-  integer mm
-  integer mm1
-  integer mn
-  integer nct
-  integer nctp1
-  integer ncu
-  integer nrt
-  integer nrtp1
-  real ( kind = rk ) s(*)
-  real ( kind = rk ) scale
-  real ( kind = rk ) ddot
-  real ( kind = rk ) shift
-  real ( kind = rk ) sl
-  real ( kind = rk ) sm
-  real ( kind = rk ) smm1
-  real ( kind = rk ) sn
-  real ( kind = rk ) dnrm2
-  real ( kind = rk ) t
-  real ( kind = rk ) t1
-  real ( kind = rk ) test
-  real ( kind = rk ) u(ldu,m)
-  real ( kind = rk ) v(ldv,n)
+  real ( kind = 8 ) a(lda,n)
+  real ( kind = 8 ) b
+  real ( kind = 8 ) c
+  real ( kind = 8 ) cs
+  real ( kind = 8 ) e(*)
+  real ( kind = 8 ) el
+  real ( kind = 8 ) emm1
+  real ( kind = 8 ) f
+  real ( kind = 8 ) g
+  integer ( kind = 4 ) info
+  integer ( kind = 4 ) iter
+  integer ( kind = 4 ) j
+  integer ( kind = 4 ) job
+  integer ( kind = 4 ) jobu
+  integer ( kind = 4 ) k
+  integer ( kind = 4 ) kase
+  integer ( kind = 4 ) kk
+  integer ( kind = 4 ) l
+  integer ( kind = 4 ) ll
+  integer ( kind = 4 ) lls
+  integer ( kind = 4 ) ls
+  integer ( kind = 4 ) lu
+  integer ( kind = 4 ), parameter :: maxit = 30
+  integer ( kind = 4 ) mm
+  integer ( kind = 4 ) mm1
+  integer ( kind = 4 ) mn
+  integer ( kind = 4 ) nct
+  integer ( kind = 4 ) nctp1
+  integer ( kind = 4 ) ncu
+  integer ( kind = 4 ) nrt
+  integer ( kind = 4 ) nrtp1
+  real ( kind = 8 ) s(*)
+  real ( kind = 8 ) scale
+  real ( kind = 8 ) ddot
+  real ( kind = 8 ) shift
+  real ( kind = 8 ) sl
+  real ( kind = 8 ) sm
+  real ( kind = 8 ) smm1
+  real ( kind = 8 ) sn
+  real ( kind = 8 ) dnrm2
+  real ( kind = 8 ) t
+  real ( kind = 8 ) t1
+  real ( kind = 8 ) test
+  real ( kind = 8 ) u(ldu,m)
+  real ( kind = 8 ) v(ldv,n)
   logical wantu
   logical wantv
-  real ( kind = rk ) work(m)
-  real ( kind = rk ) ztest
+  real ( kind = 8 ) work(m)
+  real ( kind = 8 ) ztest
 !
 !  Determine what is to be computed.
 !
@@ -1274,7 +1260,7 @@ subroutine dswap ( n, x, incx, y, incy )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license. 
+!    This code is distributed under the GNU LGPL license. 
 !
 !  Modified:
 !
@@ -1302,32 +1288,30 @@ subroutine dswap ( n, x, incx, y, incy )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of entries in the vectors.
+!    Input, integer ( kind = 4 ) N, the number of entries in the vectors.
 !
-!    Input/output, real ( kind = rk ) X(*), one of the vectors to swap.
+!    Input/output, real ( kind = 8 ) X(*), one of the vectors to swap.
 !
-!    Input, integer INCX, the increment between successive 
+!    Input, integer ( kind = 4 ) INCX, the increment between successive 
 !    entries of X.
 !
-!    Input/output, real ( kind = rk ) Y(*), one of the vectors to swap.
+!    Input/output, real ( kind = 8 ) Y(*), one of the vectors to swap.
 !
-!    Input, integer INCY, the increment between successive 
+!    Input, integer ( kind = 4 ) INCY, the increment between successive 
 !    elements of Y.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
-
-  integer i
-  integer incx
-  integer incy
-  integer ix
-  integer iy
-  integer m
-  integer n
-  real ( kind = rk ) temp
-  real ( kind = rk ) x(*)
-  real ( kind = rk ) y(*)
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) incx
+  integer ( kind = 4 ) incy
+  integer ( kind = 4 ) ix
+  integer ( kind = 4 ) iy
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) n
+  real ( kind = 8 ) temp
+  real ( kind = 8 ) x(*)
+  real ( kind = 8 ) y(*)
 
   if ( n <= 0 ) then
 
@@ -1391,7 +1375,7 @@ subroutine phi1 ( n, r, r0, v )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -1412,24 +1396,22 @@ subroutine phi1 ( n, r, r0, v )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of points.
+!    Input, integer ( kind = 4 ) N, the number of points.
 !
-!    Input, real ( kind = rk ) R(N), the radial separation.
+!    Input, real ( kind = 8 ) R(N), the radial separation.
 !    0 < R.
 !
-!    Input, real ( kind = rk ) R0, a scale factor.
+!    Input, real ( kind = 8 ) R0, a scale factor.
 !
-!    Output, real ( kind = rk ) V(N), the value of the radial basis function.
+!    Output, real ( kind = 8 ) V(N), the value of the radial basis function.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) n
 
-  integer n
-
-  real ( kind = rk ) r(n)
-  real ( kind = rk ) r0
-  real ( kind = rk ) v(n)
+  real ( kind = 8 ) r(n)
+  real ( kind = 8 ) r0
+  real ( kind = 8 ) v(n)
 
   v(1:n) = sqrt ( r(1:n)**2 + r0**2 )
 
@@ -1443,7 +1425,7 @@ subroutine phi2 ( n, r, r0, v )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -1464,24 +1446,22 @@ subroutine phi2 ( n, r, r0, v )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of points.
+!    Input, integer ( kind = 4 ) N, the number of points.
 !
-!    Input, real ( kind = rk ) R(N), the radial separation.
+!    Input, real ( kind = 8 ) R(N), the radial separation.
 !    0 < R.
 !
-!    Input, real ( kind = rk ) R0, a scale factor.
+!    Input, real ( kind = 8 ) R0, a scale factor.
 !
-!    Output, real ( kind = rk ) V(N), the value of the radial basis function.
+!    Output, real ( kind = 8 ) V(N), the value of the radial basis function.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) n
 
-  integer n
-
-  real ( kind = rk ) r(n)
-  real ( kind = rk ) r0
-  real ( kind = rk ) v(n)
+  real ( kind = 8 ) r(n)
+  real ( kind = 8 ) r0
+  real ( kind = 8 ) v(n)
 
   v = 1.0D+00 / sqrt ( r**2 + r0**2 )
 
@@ -1500,7 +1480,7 @@ subroutine phi3 ( n, r, r0, v )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -1521,25 +1501,23 @@ subroutine phi3 ( n, r, r0, v )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of points.
+!    Input, integer ( kind = 4 ) N, the number of points.
 !
-!    Input, real ( kind = rk ) R(N), the radial separation.
+!    Input, real ( kind = 8 ) R(N), the radial separation.
 !    0 < R.
 !
-!    Input, real ( kind = rk ) R0, a scale factor.
+!    Input, real ( kind = 8 ) R0, a scale factor.
 !
-!    Output, real ( kind = rk ) V(N), the value of the radial basis function.
+!    Output, real ( kind = 8 ) V(N), the value of the radial basis function.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) n
 
-  integer n
-
-  integer i
-  real ( kind = rk ) r(n)
-  real ( kind = rk ) r0
-  real ( kind = rk ) v(n)
+  integer ( kind = 4 ) i
+  real ( kind = 8 ) r(n)
+  real ( kind = 8 ) r0
+  real ( kind = 8 ) v(n)
 
   do i = 1, n
     if ( r(i) .le. 0.0D+00 ) then
@@ -1559,7 +1537,7 @@ subroutine phi4 ( n, r, r0, v )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -1580,24 +1558,22 @@ subroutine phi4 ( n, r, r0, v )
 !
 !  Parameters:
 !
-!    Input, integer N, the number of points.
+!    Input, integer ( kind = 4 ) N, the number of points.
 !
-!    Input, real ( kind = rk ) R(N), the radial separation.
+!    Input, real ( kind = 8 ) R(N), the radial separation.
 !    0 < R.
 !
-!    Input, real ( kind = rk ) R0, a scale factor.
+!    Input, real ( kind = 8 ) R0, a scale factor.
 !
-!    Output, real ( kind = rk ) V(N), the value of the radial basis function.
+!    Output, real ( kind = 8 ) V(N), the value of the radial basis function.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) n
 
-  integer n
-
-  real ( kind = rk ) r(n)
-  real ( kind = rk ) r0
-  real ( kind = rk ) v(n)
+  real ( kind = 8 ) r(n)
+  real ( kind = 8 ) r0
+  real ( kind = 8 ) v(n)
 
   v(1:n) = exp ( - 0.5D+00 * r(1:n)**2 / r0**2 )
 
@@ -1622,7 +1598,7 @@ subroutine r8mat_solve_svd ( m, n, a, b, x )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -1634,40 +1610,39 @@ subroutine r8mat_solve_svd ( m, n, a, b, x )
 !
 !  Parameters:
 !
-!    Input, integer M, N, the number of rows and columns
+!    Input, integer ( kind = 4 ) M, N, the number of rows and columns
 !    in the matrix A.
 !
-!    Input, real ( kind = rk ) A(M,N), the matrix.
+!    Input, real ( kind = 8 ) A(M,N), the matrix.
 !
-!    Input, real ( kind = rk ) B(M), the right hand side.
+!    Input, real ( kind = 8 ) B(M), the right hand side.
 !
-!    Output, real ( kind = rk ) X(N), the solution.
+!    Output, real ( kind = 8 ) X(N), the solution.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) n
 
-  integer m
-  integer n
-
-  real ( kind = rk ) a(m,n)
-  real ( kind = rk ) a_copy(m,n)
-  real ( kind = rk ) a_pseudo(n,m)
-  real ( kind = rk ) b(m)
-  real ( kind = rk ) e(max(m+1,n))
-  integer i
-  integer info
-  integer lda
-  integer ldu
-  integer ldv
-  integer job
-  real ( kind = rk ) s(m,n)
-  real ( kind = rk ) sp(n,m)
-  real ( kind = rk ) sdiag(max(m+1,n))
-  real ( kind = rk ) u(m,m)
-  real ( kind = rk ) v(n,n)
-  real ( kind = rk ) work(m)
-  real ( kind = rk ) x(n)
+  real ( kind = 8 ) a(m,n)
+  real ( kind = 8 ) a_copy(m,n)
+  real ( kind = 8 ) a_pseudo(n,m)
+  real ( kind = 8 ) b(m)
+  real ( kind = 8 ) e(max(m+1,n))
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) info
+  integer ( kind = 4 ) lda
+  integer ( kind = 4 ) ldu
+  integer ( kind = 4 ) ldv
+  integer ( kind = 4 ) job
+  integer ( kind = 4 ) lwork
+  real ( kind = 8 ) s(m,n)
+  real ( kind = 8 ) sp(n,m)
+  real ( kind = 8 ) sdiag(max(m+1,n))
+  real ( kind = 8 ) u(m,m)
+  real ( kind = 8 ) v(n,n)
+  real ( kind = 8 ) work(m)
+  real ( kind = 8 ) x(n)
 !
 !  Compute the SVD decomposition.
 !
@@ -1720,7 +1695,7 @@ subroutine rbf_interp_nd ( m, nd, xd, r0, phi, w, ni, xi, fi )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -1741,13 +1716,13 @@ subroutine rbf_interp_nd ( m, nd, xd, r0, phi, w, ni, xi, fi )
 !
 !  Parameters:
 !
-!    Input, integer M, the spatial dimension.
+!    Input, integer ( kind = 4 ) M, the spatial dimension.
 !
-!    Input, integer ND, the number of data points.
+!    Input, integer ( kind = 4 ) ND, the number of data points.
 !
-!    Input, real ( kind = rk ) XD(M,ND), the data points.
+!    Input, real ( kind = 8 ) XD(M,ND), the data points.
 !
-!    Input, real ( kind = rk ) R0, a scale factor.  R0 should be larger than 
+!    Input, real ( kind = 8 ) R0, a scale factor.  R0 should be larger than 
 !    the typical separation between points, but smaller than the maximum 
 !    separation.  The value of R0 has a significant effect on the resulting 
 !    interpolant.
@@ -1755,32 +1730,30 @@ subroutine rbf_interp_nd ( m, nd, xd, r0, phi, w, ni, xi, fi )
 !    Input, subroutine PHI ( N, R, R0, V ), a subroutine to evaluate the radial
 !    basis functions.
 !
-!    Input, real ( kind = rk ) W(ND), the weights, as computed by RBF_WEIGHTS.
+!    Input, real ( kind = 8 ) W(ND), the weights, as computed by RBF_WEIGHTS.
 !
-!    Input, integer NI, the number of interpolation points.
+!    Input, integer ( kind = 4 ) NI, the number of interpolation points.
 !
-!    Input, real ( kind = rk ) XI(M,NI), the interpolation points.
+!    Input, real ( kind = 8 ) XI(M,NI), the interpolation points.
 !
-!    Output, real ( kind = rk ) FI(NI), the interpolated values.
+!    Output, real ( kind = 8 ) FI(NI), the interpolated values.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) nd
+  integer ( kind = 4 ) ni
 
-  integer m
-  integer nd
-  integer ni
-
-  real ( kind = rk ) fi(ni)
-  integer i
-  integer j
+  real ( kind = 8 ) fi(ni)
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) j
   external phi
-  real ( kind = rk ) r(nd)
-  real ( kind = rk ) r0
-  real ( kind = rk ) v(nd)
-  real ( kind = rk ) w(nd)
-  real ( kind = rk ) xd(m,nd)
-  real ( kind = rk ) xi(m,ni)
+  real ( kind = 8 ) r(nd)
+  real ( kind = 8 ) r0
+  real ( kind = 8 ) v(nd)
+  real ( kind = 8 ) w(nd)
+  real ( kind = 8 ) xd(m,nd)
+  real ( kind = 8 ) xi(m,ni)
 
   do i = 1, ni
 
@@ -1815,7 +1788,7 @@ subroutine rbf_weight ( m, nd, xd, r0, phi, fd, w )
 !
 !  Licensing:
 !
-!    This code is distributed under the MIT license.
+!    This code is distributed under the GNU LGPL license.
 !
 !  Modified:
 !
@@ -1836,13 +1809,13 @@ subroutine rbf_weight ( m, nd, xd, r0, phi, fd, w )
 !
 !  Parameters:
 !
-!    Input, integer M, the spatial dimension.
+!    Input, integer ( kind = 4 ) M, the spatial dimension.
 !
-!    Input, integer ND, the number of data points.
+!    Input, integer ( kind = 4 ) ND, the number of data points.
 !
-!    Input, real ( kind = rk ) XD(M,ND), the data points.
+!    Input, real ( kind = 8 ) XD(M,ND), the data points.
 !
-!    Input, real ( kind = rk ) R0, a scale factor.  R0 should be larger than 
+!    Input, real ( kind = 8 ) R0, a scale factor.  R0 should be larger than 
 !    the typical separation between points, but smaller than the maximum 
 !    separation.  The value of R0 has a significant effect on the resulting 
 !    interpolant.
@@ -1850,27 +1823,25 @@ subroutine rbf_weight ( m, nd, xd, r0, phi, fd, w )
 !    Input, subroutine PHI ( N, R, R0, V ), a subroutine to evaluate the radial
 !    basis functions.
 !
-!    Input, real ( kind = rk ) FD(ND), the function values at the data points.
+!    Input, real ( kind = 8 ) FD(ND), the function values at the data points.
 !
-!    Output, real ( kind = rk ) W(ND), the weights.
+!    Output, real ( kind = 8 ) W(ND), the weights.
 !
   implicit none
 
-  integer, parameter :: rk = kind ( 1.0D+00 )
+  integer ( kind = 4 ) m
+  integer ( kind = 4 ) nd
 
-  integer m
-  integer nd
-
-  real ( kind = rk ) a(nd,nd)
-  real ( kind = rk ) fd(nd)
-  integer i
-  integer j
+  real ( kind = 8 ) a(nd,nd)
+  real ( kind = 8 ) fd(nd)
+  integer ( kind = 4 ) i
+  integer ( kind = 4 ) j
   external phi
-  real ( kind = rk ) r(nd)
-  real ( kind = rk ) r0
-  real ( kind = rk ) v(nd)
-  real ( kind = rk ) w(nd)
-  real ( kind = rk ) xd(m,nd)
+  real ( kind = 8 ) r(nd)
+  real ( kind = 8 ) r0
+  real ( kind = 8 ) v(nd)
+  real ( kind = 8 ) w(nd)
+  real ( kind = 8 ) xd(m,nd)
 
   do i = 1, nd
 
