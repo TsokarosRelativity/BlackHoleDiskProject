@@ -1,4 +1,4 @@
-module interpolation_module
+module interpolation_module 
   use iso_fortran_env, only: real64, int64
   implicit none
 
@@ -29,7 +29,7 @@ contains
     endif 
     
     row = 64600901 !matrix dimensions -> (64600901, 27) 
-    allocate(data_3d(row, 27), iostat=io_status)
+    allocate(data_3d(row, 27), stat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
       return 
@@ -54,7 +54,7 @@ contains
     endif 
     
     row = 1604 !matrix dimensions -> (1604, ) 
-    allocate(rad_arr(row), iostat=io_status)
+    allocate(rad_arr(row), stat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
       return
@@ -80,7 +80,7 @@ contains
     endif 
     
     row = 403 !matrix dimensions -> (403, ) 
-    allocate(theta_arr(row), iostat=io_status)
+    allocate(theta_arr(row), stat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
       return 
@@ -106,7 +106,7 @@ contains
     endif 
     
     row = 100 !matrix dimensions -> (100, ) 
-    allocate(phi_arr(row), iostat=io_status)
+    allocate(phi_arr(row), stat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
       return 
@@ -357,10 +357,10 @@ contains
     real(real64), dimension(27), intent(out) :: interpolateddata
     integer :: rid, tid, pid, ind, i, j, k, a, c
     integer, dimension(5) :: ps, ts, rs
-    real(real64) :: rp, thetap, phip, d1(5, 27), d2(27, 25), d3(27, 125), tmppoint(3), tmp, w1(25), w2(125) 
+    real(real64) :: rp, thetap, phip, d1(5, 27), d2(27, 25), d3(27, 125), tmppoint(3), tmp(27, 1), w1(25), w2(125) 
     real(real64), parameter :: r0 = 0.0124_real64
     logical :: rmatch, thetamatch, phimatch    
-    
+    external phi1, phi3 
     rp = point(1)
     thetap = point(2)
     phip = point(3)
@@ -511,14 +511,15 @@ contains
           tmppoint(2) = theta_arr(ts(i))
           tmppoint(3) = phi_arr(ps(j))
           call nearestneighbors3d(data_3d, tmppoint, ind)
-          d2 = TRANSPOSE(data_3d(ind, :))
+          d2(:, c) = data_3d(ind, :)
           c = c + 1
         end do
       end do
-
+      
+      tmp(:,1) = interpolateddata
       do k = 4, 27
         call rbf_weight(3, 25, d2(:3,:), r0, phi1, d2(k,:), w1)
-        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, TRANSPOSE(interpolateddata)(:3, :), interpolateddata(i))
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3), interpolateddata(i))
       end do
       return
     end if
@@ -546,16 +547,17 @@ contains
           tmppoint(1) = rad_arr(rs(i))
           tmppoint(2) = thetap
           tmppoint(3) = phi_arr(ps(j))
-          !tmppoint = [rad_arr(rs(i)), thetap, phi_arr(ps(j))]
           call nearestneighbors3d(data_3d, tmppoint, ind)
-          d2 = TRANSPOSE(data_3d(ind, :))
+          d2(:, c) = data_3d(ind, :)
           c = c + 1
         end do
       end do
+      tmp(:,1) = interpolateddata
       do k = 4, 27
         call rbf_weight(3, 25, d2(:3,:), r0, phi1, d2(k,:), w1)
-        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, TRANSPOSE(interpolateddata)(:3, :), interpolateddata(i))
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3), interpolateddata(i))
       end do
+      return
       return
     end if
 
@@ -582,17 +584,18 @@ contains
           tmppoint(1) = rad_arr(rs(i))
           tmppoint(2) = theta_arr(ts(j))
           tmppoint(3) = phip
-          !tmppoint = [rad_arr(rs(i)), theta_arr(ts(j)), phip]
           call nearestneighbors3d(data_3d, tmppoint, ind)
-          d2 = TRANSPOSE(data_3d(ind, :))
+          d2(:, c) = data_3d(ind, :)
           c = c + 1
         end do
       end do
 !
+      tmp(:,1) = interpolateddata
       do k = 4, 27
         call rbf_weight(3, 25, d2(:3,:), r0, phi1, d2(k,:), w1)
-        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, TRANSPOSE(interpolateddata)(:3, :), interpolateddata(i))
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3), interpolateddata(i))
       end do
+      return
       return
     end if
 
@@ -629,14 +632,17 @@ contains
             tmppoint(3) = phi_arr(ps(k))
 !            tmppoint = [rad_arr(rs(i)), theta_arr(ts(j)), phi_arr(ps(k))]
             call nearestneighbors3d(data_3d, tmppoint, ind)
-            d3 = TRANSPOSE(data_3d(ind, :))
+
+            d2(:, c) = data_3d(ind, :)
             c = c + 1
           end do
         end do
       end do
+
+      tmp(:,1) = interpolateddata
       do k = 4, 27
-        call rbf_weight(3, 125, d2(:3,:), r0, phi3, d2(k,:), w2)
-        call rbf_interp_nd(3, 125, d2(:3, :), r0, phi3, w2, 1, TRANSPOSE(interpolateddata)(:3, :), interpolateddata(i))
+        call rbf_weight(3, 125, d3(:3,:), r0, phi3, d3(k,:), w2)
+        call rbf_interp_nd(3, 125, d3(:3, :), r0, phi3, w2, 1, tmp(:3), interpolateddata(i))
       end do
       return
     end if
@@ -657,11 +663,10 @@ contains
 
   subroutine gridwriter(grid, iou)
     type(gridparams), intent(in) :: grid
-    integer :: ntot
-    integer, intent(in) :: iou
+    integer :: ntot, iou
     
     ntot = grid%nx * grid%ny * grid%nz
-    open(newunit=iou, file=trum(grid%outputfile), status='replace', form='unformatted', access='stream', action='write')
+    open(newunit=iou, file=trim(grid%outputfile), status='replace', form='unformatted', access='stream', action='write')
     
     write(iou) real(grid%nx, kind=real64), real(grid%ny, kind=real64), real(grid%nz, kind=real64), real(ntot, kind=real64) 
 
@@ -681,7 +686,7 @@ contains
 end module interpolation_module
 
 program main 
-  use interpolation_module
+  use interpolation_module 
   implicit none
   call routine()
 end program main

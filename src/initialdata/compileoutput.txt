@@ -1,0 +1,58 @@
+interpolation.f90(32): error #8159: Only STAT=, ERRMSG=, SOURCE= and MOLD= are allowed as specifiers in ALLOCATE statement.   [IOSTAT]
+    allocate(data_3d(row, 27), iostat=io_status)
+-------------------------------^
+interpolation.f90(57): error #8159: Only STAT=, ERRMSG=, SOURCE= and MOLD= are allowed as specifiers in ALLOCATE statement.   [IOSTAT]
+    allocate(rad_arr(row), iostat=io_status)
+---------------------------^
+interpolation.f90(83): error #8159: Only STAT=, ERRMSG=, SOURCE= and MOLD= are allowed as specifiers in ALLOCATE statement.   [IOSTAT]
+    allocate(theta_arr(row), iostat=io_status)
+-----------------------------^
+interpolation.f90(109): error #8159: Only STAT=, ERRMSG=, SOURCE= and MOLD= are allowed as specifiers in ALLOCATE statement.   [IOSTAT]
+    allocate(phi_arr(row), iostat=io_status)
+---------------------------^
+interpolation.f90(524): error #6404: This name does not have a type, and must have an explicit type.   [PHI1]
+        call rbf_weight(3, 25, d2(:3,:), r0, phi1, d2(k,:), w1)
+---------------------------------------------^
+interpolation.f90(525): error #6641: There are missing arguments in an array reference.   [TMP]
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3, ), interpolateddata(i))
+--------------------------------------------------------------^
+interpolation.f90(560): error #6366: The shapes of the array expressions do not conform.   [TMP]
+      tmp(:,1) = interpolateddata
+------^
+interpolation.f90(563): error #6641: There are missing arguments in an array reference.   [TMP]
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3, ), interpolateddata(i))
+--------------------------------------------------------------^
+interpolation.f90(600): error #6366: The shapes of the array expressions do not conform.   [TMP]
+      tmp(:,1) = interpolateddata
+------^
+interpolation.f90(603): error #6641: There are missing arguments in an array reference.   [TMP]
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3, ), interpolateddata(i))
+--------------------------------------------------------------^
+interpolation.f90(643): error #8093: A do-variable within a DO body shall not appear in a variable definition context.   [K]
+            do k = 1, 25
+---------------^
+interpolation.f90(643): error #6511: This DO variable has already been used as an outer DO variable in the same nesting structure.   [K]
+            do k = 1, 25
+---------------^
+interpolation.f90(651): error #6366: The shapes of the array expressions do not conform.   [TMP]
+      tmp(:,1) = interpolateddata
+------^
+interpolation.f90(653): error #6404: This name does not have a type, and must have an explicit type.   [PHI3]
+        call rbf_weight(3, 125, d3(:3,:), r0, phi3, d3(k,:), w2)
+----------------------------------------------^
+interpolation.f90(654): error #6641: There are missing arguments in an array reference.   [TMP]
+        call rbf_interp_nd(3, 125, d3(:3, :), r0, phi3, w2, 1, tmp(:3, ), interpolateddata(i))
+---------------------------------------------------------------^
+interpolation.f90(679): error #6780: A dummy argument with the INTENT(IN) attribute shall not be defined nor become undefined.   [IOU]
+    open(newunit=iou, file=trum(grid%outputfile), status='replace', form='unformatted', access='stream', action='write')
+-----------------^
+interpolation.f90(679): error #6404: This name does not have a type, and must have an explicit type.   [TRUM]
+    open(newunit=iou, file=trum(grid%outputfile), status='replace', form='unformatted', access='stream', action='write')
+---------------------------^
+interpolation.f90(679): error #7838: A scalar default-integer variable is required in this context.   [TRUM]
+    open(newunit=iou, file=trum(grid%outputfile), status='replace', form='unformatted', access='stream', action='write')
+---------------------------^
+interpolation.f90(699): error #7002: Error in opening the compiled module file.  Check INCLUDE paths.   [INTERPOLATION_MODULE]
+  use interpolation_module 
+------^
+compilation aborted for interpolation.f90 (code 1)
