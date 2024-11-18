@@ -18,28 +18,28 @@ contains
 ! tested and works  
   subroutine load_data()
     character(len=100) :: filename
-    integer :: io_status, ind, rows
+    integer :: io_status, ind, row
     ! Implement data loading here
     print *, "Loading in 3D data..."
     filename = "df3d.txt"
     open(unit=8, file=filename, status='old', action='read', iostat=io_status)
     if (io_status /= 0) then
       print *, "Error opening file: ", filename
-      exit
+      return
     endif 
     
-    rows = 64600901 !matrix dimensions -> (64600901, 27) 
-    allocate(data_3d(rows, 27), stat=io_status)
+    row = 64600901 !matrix dimensions -> (64600901, 27) 
+    allocate(data_3d(row, 27), iostat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
-      exit
+      return 
     end if
     
     do ind = 1, row
-      read(8, '(27ES16.6)', stat=io_status) data_3d(ind, :)
+      read(8, '(27ES16.6)', iostat=io_status) data_3d(ind, :)
       if (io_status /= 0) then
         print *, "Error reading data on line " , ind
-        exit
+        return 
       end if
     end do
 
@@ -50,21 +50,21 @@ contains
     open(unit=7, file=filename, status='old', action='read', iostat=io_status)
     if (io_status /= 0) then
       print *, "Error opening file: ", filename
-      exit
+      return
     endif 
     
-    rows = 1604 !matrix dimensions -> (1604, ) 
-    allocate(rad_arr(rows), stat=io_status)
+    row = 1604 !matrix dimensions -> (1604, ) 
+    allocate(rad_arr(row), iostat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
-      exit
+      return
     end if
     
     do ind = 1, row
-      read(7, '(ES16.6)', stat=io_status) rad_arr(ind)
+      read(7, '(ES16.6)', iostat=io_status) rad_arr(ind)
       if (io_status /= 0) then
         print *, "Error reading data on line " , ind
-        exit
+        return      
       end if
     end do
 
@@ -76,21 +76,21 @@ contains
     open(unit=10, file=filename, status='old', action='read', iostat=io_status)
     if (io_status /= 0) then
       print *, "Error opening file: ", filename
-      exit
+      return 
     endif 
     
-    rows = 403 !matrix dimensions -> (403, ) 
-    allocate(theta_arr(rows), stat=io_status)
+    row = 403 !matrix dimensions -> (403, ) 
+    allocate(theta_arr(row), iostat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
-      exit
+      return 
     end if
     
     do ind = 1, row
-      read(10, '(ES16.6)', stat=io_status) theta_arr(ind)
+      read(10, '(ES16.6)', iostat=io_status) theta_arr(ind)
       if (io_status /= 0) then
         print *, "Error reading data on line " , ind
-        exit
+        return 
       end if
     end do
 
@@ -102,21 +102,21 @@ contains
     open(unit=11, file=filename, status='old', action='read', iostat=io_status)
     if (io_status /= 0) then
       print *, "Error opening file: ", filename
-      exit
+      return 
     endif 
     
-    rows = 100 !matrix dimensions -> (100, ) 
-    allocate(phi_arr(rows), stat=io_status)
+    row = 100 !matrix dimensions -> (100, ) 
+    allocate(phi_arr(row), iostat=io_status)
     if (io_status /= 0) then 
       print *, "Error allocating data"
-      exit
+      return 
     end if
     
     do ind = 1, row
-      read(11, '(ES16.6)', stat=io_status) phi_arr(ind)
+      read(11, '(ES16.6)', iostat=io_status) phi_arr(ind)
       if (io_status /= 0) then
         print *, "Error reading data on line " , ind
-        exit
+        return 
       end if
     end do
 
@@ -130,11 +130,6 @@ contains
     d = sqrt((p1 - p2)**2)
   end subroutine distanceEuclidian
 
-  subroutine distanceEuclidian2d(p1, p2, d)
-    real(real64), intent(in) :: p1, p2
-    real(real64), intent(out) :: d
-    d = sqrt((p1 - p2)**2)
-  end subroutine distanceEuclidian2d 
 
   subroutine distanceEuclidian3d(p1, p2, d)
     real(real64), intent(in) :: p1(3), p2(3)
@@ -161,22 +156,6 @@ contains
 
   end subroutine nearestneighbors
 
-  subroutine nearestneighbors2d(pdata, p, n)
-    real(real64), intent(in) :: pdata(:,:), p(2)
-    integer, intent(out) :: n
-    integer :: i
-    real(real64) :: d, dmin
-    
-    dmin = huge(dmin)
-    do i = 1, size(pdata, 1)
-      call distanceEuclidian2d(pdata(i, :), p, d)
-      if (d < dmin) then
-        dmin = d
-        n = i
-      end if
-    end do
-
-  end subroutine nearestneighbors2d
 
   subroutine nearestneighbors3d(pdata, p, n)
     real(real64), intent(in) :: pdata(:,:), p(3)
@@ -336,12 +315,12 @@ contains
   subroutine cartesian_to_spherical(cart_coords, sph_coords, n_points)
       implicit none
       ! Input/output variables
-      integer, intent(in) :: n_points
+      integer(int64), intent(in) :: n_points
       real(real64), intent(in) :: cart_coords(n_points, 27)  ! Changed from real(int64)
       real(real64), intent(out) :: sph_coords(n_points, 27)  ! Changed from real(int64)
       
       ! Local variables
-      integer :: i
+      integer(int64) :: i
       real(real64) :: x, y, z, r  ! Changed from real(int64)
       real(real64), parameter :: eps = 1.0d-14  ! Changed from real(int64)
       
