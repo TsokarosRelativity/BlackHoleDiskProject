@@ -1,5 +1,6 @@
 module interpolation_module 
   use iso_fortran_env, only: real64, int64
+  use bary
   implicit none
 
   ! Global variables
@@ -413,6 +414,64 @@ contains
     interpolateddata(1) = rp
     interpolateddata(2) = thetap
     interpolateddata(3) = phip
+
+
+!  subroutine lagcheby1_interp_1d( nd, xd, yd, ni, xi, yi )
+!
+!  !*****************************************************************************80
+!  !
+!  !! lagcheby1_interp_1d() evaluates the Lagrange Chebyshev 1 interpolant.
+!  !
+!  !  Discussion:
+!  !
+!  !    The weight vector WD computed below is only valid if the data points
+!  !    XD are, as expected, the Chebyshev Type 1 points for [-1,+1], or a linearly
+!  !    mapped version for [A,B].  The XD values may be computed by:
+!  !
+!  !      xd = r8vec_cheby1space ( nd, a, b )
+!  !
+!  !    for instance.
+!  !
+!  !    Thanks to John Ferrier for point out that DENOM and NUMER were not
+!  !    being initialized, 16 September 2013.
+!  !
+!  !  Licensing:
+!  !
+!  !    This code is distributed under the MIT license.
+!  !
+!  !  Modified:
+!  !
+!  !    01 September 2021
+!  !
+!  !  Author:
+!  !
+!  !    John Burkardt
+!  !
+!  !  Reference:
+!  !
+!  !    Jean-Paul Berrut, Lloyd Trefethen,
+!  !    Barycentric Lagrange Interpolation,
+!  !    SIAM Review,
+!  !    Volume 46, Number 3, September 2004, pages 501-517.
+!  !
+!  !  Input:
+!  !
+!  !    integer ND, the number of data points.
+!  !    ND must be at least 1.
+!  !
+!  !    real ( kind = rk ) XD(ND), the data points.
+!  !
+!  !    real ( kind = rk ) YD(ND), the data values.
+!  !
+!  !    integer NI, the number of interpolation points.
+!  !
+!  !    real ( kind = rk ) XI(NI), the interpolation points.
+!  !
+!  !  Output:
+!  !
+!  !    real ( kind = rk ) YI(NI), the interpolated values.
+
+
     ! case 2: phi not match
     if (rmatch .and. thetamatch .and. .not. phimatch) then
       if (pid < 3) then 
@@ -432,7 +491,7 @@ contains
       end do
       
       do i = 4, 27
-        call lagcheby1_interp_1d(5, phi_arr(ps), d1(:, i), 1, phip, interpolateddata(i))
+        call lagcheby1_interp_1d(5, phi_arr(ps), d1(:, i), 1, interpolateddata(3), interpolateddata(i))
       end do
       return
     end if
@@ -456,7 +515,7 @@ contains
       end do
 
       do i = 4, 27
-        call lagcheby1_interp_1d(5, theta_arr(ts), d1(:, i), 1, thetap, interpolateddata(i))
+        call lagcheby1_interp_1d(5, theta_arr(ts), d1(:, i), 1, interpolateddata(2), interpolateddata(i))
       end do
       return
     end if
@@ -481,7 +540,7 @@ contains
         d1(i, :) = data_3d(ind, :)
       end do
       do i = 4, 27
-        call lagcheby1_interp_1d(5, rad_arr(rs), d1(:, i), 1, rp, interpolateddata(i))
+        call lagcheby1_interp_1d(5, rad_arr(rs), d1(:, i), 1, interpolateddata(1), interpolateddata(i))
       end do
       return
       ! interpolate
@@ -519,7 +578,7 @@ contains
       tmp(:,1) = interpolateddata
       do k = 4, 27
         call rbf_weight(3, 25, d2(:3,:), r0, phi1, d2(k,:), w1)
-        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3), interpolateddata(i))
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3,1), interpolateddata(i))
       end do
       return
     end if
@@ -555,7 +614,7 @@ contains
       tmp(:,1) = interpolateddata
       do k = 4, 27
         call rbf_weight(3, 25, d2(:3,:), r0, phi1, d2(k,:), w1)
-        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3), interpolateddata(i))
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3,1), interpolateddata(i))
       end do
       return
       return
@@ -593,7 +652,7 @@ contains
       tmp(:,1) = interpolateddata
       do k = 4, 27
         call rbf_weight(3, 25, d2(:3,:), r0, phi1, d2(k,:), w1)
-        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3), interpolateddata(i))
+        call rbf_interp_nd(3, 25, d2(:3, :), r0, phi1, w1, 1, tmp(:3,1), interpolateddata(i))
       end do
       return
       return
@@ -642,7 +701,7 @@ contains
       tmp(:,1) = interpolateddata
       do k = 4, 27
         call rbf_weight(3, 125, d3(:3,:), r0, phi3, d3(k,:), w2)
-        call rbf_interp_nd(3, 125, d3(:3, :), r0, phi3, w2, 1, tmp(:3), interpolateddata(i))
+        call rbf_interp_nd(3, 125, d3(:3, :), r0, phi3, w2, 1, tmp(:3,1), interpolateddata(i))
       end do
       return
     end if
@@ -676,7 +735,7 @@ contains
   end subroutine
   subroutine routine()
     integer :: i
-    call read_data()
+    call load_data()
     call process_line()
     do i = 1, 1280 
       call interpolategrid(grids(i))

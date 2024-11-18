@@ -332,33 +332,33 @@ end module bary
 
 
 
-program barytest
-  use bary
-  use iso_fortran_env, only: real64, int64
-  implicit none
-
-  real(real64) :: grid(10, 2), i, xi(4), yi(4)
-  integer :: ns
-
-  ns = 10 
-  do i = 1, 10
-    grid(i, 1) = real(i, kind=real64)
-    grid(i, 2) = real(sqrt(i + 4) + 14, kind = real64)
-  end do
-  
-  xi = [2.0_real64, 2.3_real64, 7.2_real64, 5.0_real64]
-  print *, "query points:"
-  do i = 1, 4
-    print *, xi(i), real(sqrt(xi(i) + 4) + 14, kind = real64)
-  end do
-  print *, "interpolation"
-  call lagcheby1_interp_1d( 10, grid(:, 1), grid(:, 2), 4, xi, yi)
-  do i = 1, 4
-    print *, xi(i), yi(i)
-  end do
-  !subroutine lagcheby1_interp_1d( nd, xd, yd, ni, xi, yi )
-  ! 
-end program barytest
+!program barytest
+!  use bary
+!  use iso_fortran_env, only: real64, int64
+!  implicit none
+!
+!  real(real64) :: grid(10, 2), i, xi(4), yi(4)
+!  integer :: ns
+!
+!  ns = 10 
+!  do i = 1, 10
+!    grid(i, 1) = real(i, kind=real64)
+!    grid(i, 2) = real(sqrt(i + 4) + 14, kind = real64)
+!  end do
+!  
+!  xi = [2.0_real64, 2.3_real64, 7.2_real64, 5.0_real64]
+!  print *, "query points:"
+!  do i = 1, 4
+!    print *, xi(i), real(sqrt(xi(i) + 4) + 14, kind = real64)
+!  end do
+!  print *, "interpolation"
+!  call lagcheby1_interp_1d( 10, grid(:, 1), grid(:, 2), 4, xi, yi)
+!  do i = 1, 4
+!    print *, xi(i), yi(i)
+!  end do
+!  !subroutine lagcheby1_interp_1d( nd, xd, yd, ni, xi, yi )
+!  ! 
+!end program barytest
 
 
 
