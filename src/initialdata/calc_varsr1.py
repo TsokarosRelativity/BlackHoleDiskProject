@@ -3,6 +3,8 @@ import time
 import pandas as pd
 import argparse
 
+# last edited: Shreyas Jammi 1-26-2025  
+
 parser = argparse.ArgumentParser(
     prog="Calc Vars: Updated Jacobian",
     description="2D -> 3D Initial Data: Calculate Variables Routine",
@@ -223,12 +225,14 @@ s7 = time.time()
 df["gxx"] = (df.psi**4 * np.exp(2 * df.q)) * (
     ((df.x / df.r) ** 2) + ((df.z * np.cos(df.phi) / df.r) ** 2)
 ) + np.sin(df.phi) ** 2 * df.psi**4
+
 df["gxy"] = (
     df.psi**4
     * np.exp(2 * df.q)
     * (df.x * df.y / df.r**2 + df.z**2 * np.cos(df.phi) * np.sin(df.phi) / df.r**2)
     - np.sin(df.phi) * np.cos(df.phi) * df.psi**4
 )
+
 df["gxz"] = (
     df.psi**4
     * np.exp(2 * df.q)
@@ -420,51 +424,71 @@ s12 = time.time()
 # print(df)
 # print(df.describe())
 
-df["F_vp"] = np.where(
-    (~(df["b2"] < 0)) & (~(df["psi"] == 0)),
-    np.sign(df["b_phi"])
-    * np.abs(np.sqrt(df["b2"]))
-    * df["r"]
-    * (np.exp(2 * df["q"]))
-    * ((df["psi"]) ** 4),
-    np.float64(0),
-)
-# df['F_vp'] = df['F_vp'].replace([np.nan, np.inf, -np.inf], 0)
+df["F_vp"] = df["r"] * (np.exp(2*df["q"])) * (df["psi"]**4) * (np.abs(np.sqrt(df["b2"]))) 
 
-pivot = df.pivot_table(
-    index="theta", columns="r", values="F_vp", aggfunc="first"
-).astype("float64")
-pivot.columns = pivot.columns.astype("float64")
-A_phi = np.cumsum(np.diff(pivot, prepend=0, axis=1) * np.cumsum(pivot, axis=1), axis=1)
-A_phi = np.where(np.isfinite(A_phi), A_phi, np.float64(0))
-A_phi[np.isnan(A_phi)] = np.float64(0)  # Note: use '=' instead of '=='
+F_vp_piv = pd.pivot_table(df, values=["F_vp"], index=["theta"], columns=["r"])
+F_vp_piv = F_vp_piv.cumsum(axis=1).unstack().reset_index(name="A_theta")
+F_vp_piv = F_vp_piv.drop("level_0", axis=1)
 
-# Convert A_phi back to a DataFrame
-A_phi_df = pd.DataFrame(
-    A_phi, index=pivot.index, columns=pivot.columns.astype("float64")
-)
-# print(A_phi_df)
-result = A_phi_df.reset_index().melt(id_vars="theta", var_name="r", value_name="A_phi")
-result["r"] = result["r"].astype("float64")
-# print(result)
-# result.to_hdf(args.folder + '3D_data/vectorpotentialresult.h5', key='df', mode='w')
-df = pd.merge(df, result, on=["theta", "r"], how="left")
-# Theta 0 -> all r values
+df = pd.merge(df, F_vp_piv, on=["r", "theta"])
+
+
+
+##df["F_vp"] = np.where(
+##    (~(df["b2"] < 0)) & (~(df["psi"] == 0)),
+##    np.sign(df["b_phi"])
+##    * np.abs(np.sqrt(df["b2"]))
+##    * df["r"]
+##    * (np.exp(2 * df["q"]))
+##    * ((df["psi"]) ** 4),
+##    np.float64(0),
+##)
+## df['F_vp'] = df['F_vp'].replace([np.nan, np.inf, -np.inf], 0)
+#
+##pivot = df.pivot_table(
+##    index="theta", columns="r", values="F_vp", aggfunc="first"
+##).astype("float64")
+##pivot.columns = pivot.columns.astype("float64")
+##A_phi = np.cumsum(np.diff(pivot, prepend=0, axis=1) * np.cumsum(pivot, axis=1), axis=1)
+##A_phi = np.where(np.isfinite(A_phi), A_phi, np.float64(0))
+##A_phi[np.isnan(A_phi)] = np.float64(0)  # Note: use '=' instead of '=='
+##
+## Convert A_phi back to a DataFrame
+#A_phi_df = pd.DataFrame(
+#    A_phi, index=pivot.index, columns=pivot.columns.astype("float64")
+#)
+## print(A_phi_df)
+#result = A_phi_df.reset_index().melt(id_vars="theta", var_name="r", value_name="A_phi")
+#result["r"] = result["r"].astype("float64")
+## print(result)
+## result.to_hdf(args.folder + '3D_data/vectorpotentialresult.h5', key='df', mode='w')
+#df = pd.merge(df, result, on=["theta", "r"], how="left")
+## Theta 0 -> all r values
 # ...
 # Theta N
-df["A_x"] = df["J_20"] * df["A_phi"]
-df["A_y"] = df["J_21"] * df["A_phi"]
-df["A_z"] = np.float64(0)
-df["A_x"] = df["A_x"].replace([np.nan, np.inf, -np.inf], np.float64(0))
-df["A_y"] = df["A_y"].replace([np.nan, np.inf, -np.inf], np.float64(0))
+#df["A_x"] = df["J_20"] * df["A_phi"]
+#df["A_y"] = df["J_21"] * df["A_phi"]
+#df["A_z"] = np.float64(0)
+#df["A_x"] = df["A_x"].replace([np.nan, np.inf, -np.inf], np.float64(0))
+#df["A_y"] = df["A_y"].replace([np.nan, np.inf, -np.inf], np.float64(0))
 # print(df)
 # print(df.describe())
+
+df["A_x"] = df["J_10"] * df["A_theta"]
+df["A_y"] = df["J_11"] * df["A_theta"]
+df["A_z"] = df["J_12"] * df["A_theta"]
+
 if args.v:
     print("-----------------------------------------------")
     # df.to_hdf(args.folder + '3D_data/dfaftervectorpotential.h5', key='df', mode='w')
     print("calculations completed in {} seconds".format(time.time() - s12))
 
     print("-----------------------------------------------")
+
+
+df = df.drop_duplicates()
+# dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
+df.to_hdf(args.folder + "3D_data/checkpoint.h5", key="df", mode="w")
 
 
 # populating below the horizon
@@ -526,38 +550,6 @@ ret_df = dfall[
     ]
 ]
 
-origin = {
-    "r": [np.float64(0)],
-    "theta": [np.float64(0)],
-    "phi": [np.float64(0)],
-    "alpha": [np.float64(-1.0)],
-    "beta__x": [np.float64(0)],
-    "beta__y": [np.float64(0)],
-    "beta__z": [np.float64(0)],
-    "psi": [np.float64(1)],
-    "gxx": [np.float64(1)],
-    "gxy": [np.float64(0)],
-    "gxz": [np.float64(0)],
-    "gyy": [np.float64(1)],
-    "gyz": [np.float64(0)],
-    "gzz": [np.float64(1)],
-    "Kxx": [np.float64(0)],
-    "Kxy": [np.float64(0)],
-    "Kxz": [np.float64(0)],
-    "Kyy": [np.float64(0)],
-    "Kyz": [np.float64(0)],
-    "Kzz": [np.float64(0)],
-    "rho": [np.float64(0)],
-    "u__x": [np.float64(0)],
-    "u__y": [np.float64(0)],
-    "u__z": [np.float64(0)],
-    "A_x": [np.float64(0)],
-    "A_y": [np.float64(0)],
-    "A_z": [np.float64(0)],
-}
-
-origin_df = pd.DataFrame(origin)
-ret_df = pd.concat([ret_df, origin_df], axis=0, ignore_index=True)
 
 ret_df = ret_df.drop_duplicates()
 # dfall = pd.concat([df, horizondf], axis=0, ignore_index=True)
