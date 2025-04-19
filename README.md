@@ -189,4 +189,27 @@ end do
 ! Close file
 close(114)
 ```
-This is an example of how to simply write scalar variables over the grid; in this case I am storing $x,z,r,\theta,\rho,\psi,\alpha, \partial_r \beta_T, \partial_{\theta} \beta_T$ on each row of the file. Note that the order of the do loops determines the output structure; in this case loop over $\theta$'s with fixed r value, then change r. 
+This is an example of how to simply write scalar variables over the grid; in this case I am storing $x,z,r,\theta,\rho,\psi,\alpha, \partial_r \beta_T, \partial_{\theta} \beta_T$ on each row of the file. Note that the order of the do loops determines the output structure; in this case loop over $\theta$'s with fixed r value, then change r.
+
+
+-----------------------------
+
+
+# TLDR Running the Interpolation Routine
+
+## 2D to 3D scripts
+to run the 2d to 3d initial data routine, the scripts are in the "src/initialdata" directory (actually all of the code is in this directory)
+
+the 2d initial data is contained within the sho100.f95 FORTRAN code, and by running the "run.sh" script, we should be able to generate the necessary initial data
+
+the "run.sh" script should generate 4 distinct directories (2d, 3d, processed_grids, and plots) and outputs the 2d data generated from the FORTRAN code within the 2D directory. 
+
+Running the 3D initial data is also contained within the "run.sh" script, however it is commented out for now. Things to note would be the iteration levels of the 2d initial data correspond to the accuracy of the FORTRAN script, which can be changed within the hyperparameters within the script itself.
+
+Once you have generated the 3d initial data, then you can interpolate the initial data onto the grids using the "interprun.sh" script, which should handle everything for you.
+
+things to note:
+- "newgrids": this is the new grids that Milton gave -> these are split into 33 different files to just parallelize the process and make it a lot faster
+- "interpolationroutine.py": this is the interpolation routine written in python
+
+
